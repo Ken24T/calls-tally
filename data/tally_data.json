@@ -1,7 +1,9 @@
 {
   "users": [
     "Ken",
-    "Jaclyn"
+    "Jaclyn",
+    "John",
+    "Wendy"
   ],
   "entries": [
     {
@@ -88,7 +90,39 @@
       "user": "Ken",
       "date": false,
       "comments": "",
-      "calls": 0,
+      "calls": 1,
+      "connections": 0,
+      "email": 0,
+      "sms": 0,
+      "form6_sent": 0,
+      "form6_received": 0,
+      "leads": 0,
+      "appointments": 0,
+      "cma": 0,
+      "appraisals": 0,
+      "tasks": 0
+    },
+    {
+      "user": "Ken",
+      "date": "2025-05-22",
+      "comments": "",
+      "calls": 1,
+      "connections": 1,
+      "email": 1,
+      "sms": 0,
+      "form6_sent": 0,
+      "form6_received": 0,
+      "leads": 0,
+      "appointments": 0,
+      "cma": 0,
+      "appraisals": 0,
+      "tasks": 0
+    },
+    {
+      "user": "Ken",
+      "date": "2025-05-29",
+      "comments": "",
+      "calls": 1,
       "connections": 0,
       "email": 0,
       "sms": 0,

@@ -38,13 +38,24 @@ class MainWindow(QMainWindow):
         self.save_button = QPushButton("Save")
         self.save_button.clicked.connect(self.save_data)
         self.save_button.setObjectName("primary-button")
+        self.save_button.setEnabled(False)  # Initially disabled
         self.main_layout.addWidget(self.save_button)
+
+        # Add done button below save button
+        self.done_button = QPushButton("Done")
+        self.done_button.clicked.connect(self.handle_done)
+        self.done_button.setObjectName("primary-button")
+        self.main_layout.addWidget(self.done_button)
+
+        # Track unsaved changes
+        self.dirty = False
         
         # Update user dropdown and clear current selection
         self.update_user_dropdown()
         self.user_combo.setCurrentIndex(-1)
         
         self.user_combo.currentIndexChanged.connect(self.load_user_entry)
+        self.user_combo.currentIndexChanged.connect(self.update_save_button_state)  # Enable/disable Save
         self.date_edit.dateChanged.connect(self.load_user_entry)
     
     def create_menus(self):
@@ -61,10 +72,11 @@ class MainWindow(QMainWindow):
         # Reports menu
         reports_menu = menu_bar.addMenu("Reports")
         
-        generate_report_action = QAction("Generate Report", self)
-        generate_report_action.triggered.connect(self.show_report_dialog)
-        reports_menu.addAction(generate_report_action)
-    
+        self.generate_report_action = QAction("Generate Report", self)
+        self.generate_report_action.triggered.connect(self.show_report_dialog)
+        reports_menu.addAction(self.generate_report_action)
+        self.generate_report_action.setEnabled(False)
+
     def create_form(self):
         # User selection
         user_layout = QHBoxLayout()
@@ -75,9 +87,16 @@ class MainWindow(QMainWindow):
         user_layout.addWidget(user_label)
         
         self.user_combo = QComboBox()
-        # Make user_combo expand horizontally
+        # Make user_combo expand horizontally but leave room for the add button
         self.user_combo.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         user_layout.addWidget(self.user_combo)
+        
+        # Add '+' button to the right of the user_combo
+        self.add_user_button = QPushButton("+")
+        self.add_user_button.setFixedWidth(40)
+        self.add_user_button.setToolTip("Add new user")
+        self.add_user_button.clicked.connect(self.add_user)
+        user_layout.addWidget(self.add_user_button)
         
         # Date selection
         date_layout = QHBoxLayout()
@@ -114,17 +133,14 @@ class MainWindow(QMainWindow):
         for name in counter_names:
             field_name = name.lower().replace(" ", "_")
             counter_layout = QHBoxLayout()
-            
-            # Create spin box with buttons
             spin_box = QSpinBox()
             spin_box.setMinimum(0)
             spin_box.setMaximum(999)
-            # Let each spin box expand if needed
+            spin_box.setMinimumHeight(28)
             spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            # NEW: Autosave immediately when the value changes
             spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
+            spin_box.valueChanged.connect(self.mark_dirty)
             counter_layout.addWidget(spin_box)
-            
             counters_layout.addRow(name, counter_layout)
             self.counters[field_name] = spin_box
         
@@ -137,6 +153,7 @@ class MainWindow(QMainWindow):
         self.comments_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         # NEW: Autosave on every change in comments
         self.comments_edit.textChanged.connect(self.autosave)
+        self.comments_edit.textChanged.connect(self.mark_dirty)
         self.main_layout.addWidget(self.comments_edit)
         
         # Add stretch so extra space is used dynamically
@@ -144,15 +161,34 @@ class MainWindow(QMainWindow):
     
     def update_user_dropdown(self):
         # Get users and update combo box with no default selection
+        self.user_combo.blockSignals(True)
         self.user_combo.clear()
         users = self.data_manager.get_users()
         if users:
             self.user_combo.addItems(users)
-        # Leave selection empty regardless of users added
+            self.user_combo.setCurrentIndex(-1)  # No selection
+        else:
+            self.user_combo.setCurrentIndex(-1)
+        self.user_combo.blockSignals(False)
+        self.update_save_button_state()
     
+    def update_save_button_state(self):
+        # Enable Save only if a valid user is selected (index >= 0 and text not empty)
+        idx = self.user_combo.currentIndex()
+        txt = self.user_combo.currentText()
+        enabled = idx >= 0 and bool(txt.strip())
+        self.save_button.setEnabled(enabled)
+        if hasattr(self, 'generate_report_action'):
+            self.generate_report_action.setEnabled(enabled)
+
     def add_user(self):
         name, ok = QInputDialog.getText(self, "Add User", "Enter user's first name:")
         if ok and name:
+            # Check if user already exists (case-insensitive)
+            existing_users = [u.lower() for u in self.data_manager.get_users()]
+            if name.lower() in existing_users:
+                QMessageBox.warning(self, "User Exists", f"The user '{name}' already exists.")
+                return
             # Add user to data manager
             self.data_manager.add_user(name)
             self.update_user_dropdown()
@@ -179,6 +215,7 @@ class MainWindow(QMainWindow):
         self.data_manager.save_entry(entry_data)
         print("Autosave triggered. Entry data:", entry_data)
         QApplication.beep()
+        self.dirty = False
     
     def load_user_entry(self):
         """Load existing call statistics for the selected user and date into the UI."""
@@ -208,9 +245,13 @@ class MainWindow(QMainWindow):
         self.comments_edit.blockSignals(False)
         
         self.update_calendar_styles()
-        
+        self.dirty = False
+    
     def show_report_dialog(self):
+        user = self.user_combo.currentText()
         report_dialog = ReportDialog(self.data_manager)
+        if user:
+            report_dialog.setWindowTitle(f"Report for {user}")
         report_dialog.exec()
     
     def update_calendar_styles(self):
@@ -255,3 +296,15 @@ class MainWindow(QMainWindow):
     
     def autosave(self):
         self.save_data()
+        self.dirty = False
+
+    def mark_dirty(self):
+        self.dirty = True
+        self.update_save_button_state()
+
+    def handle_done(self):
+        if self.dirty:
+            reply = QMessageBox.question(self, "Unsaved Changes", "You have unsaved changes. Are you sure you want to exit?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            if reply == QMessageBox.StandardButton.No:
+                return
+        QApplication.quit()
