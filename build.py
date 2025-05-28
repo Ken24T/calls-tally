@@ -4,6 +4,21 @@ import os
 import glob
 import sys  # using the current interpreter
 
+def check_git_clean():
+    """Check if the git working directory is clean."""
+    try:
+        result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+        if result.returncode != 0:
+            print("Warning: Could not check git status. Proceeding anyway.")
+            return True
+        if result.stdout.strip():
+            print("Error: Your git working directory is not clean. Commit or stash your changes before building.")
+            return False
+        return True
+    except Exception as e:
+        print(f"Warning: Could not check git status: {e}. Proceeding anyway.")
+        return True
+
 def clean_previous_builds():
     # Remove build and dist directories and any spec files if they exist.
     for folder in ['build', 'dist']:
@@ -13,6 +28,8 @@ def clean_previous_builds():
         os.remove(spec)
 
 def main():
+    if not check_git_clean():
+        sys.exit(1)
     clean_previous_builds()
     # Run PyInstaller using the current interpreter.
     # Added "--add-data" for styles.qss so that it is included alongside the executable.
