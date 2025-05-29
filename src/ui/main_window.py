@@ -16,7 +16,7 @@ class MainWindow(QMainWindow):
         
         # Set up the main window
         self.setWindowTitle("Calls Tally App")
-        self.setMinimumSize(200, 600)  # Lowered minimum width to allow horizontal shrinking
+        self.setFixedSize(300, 900)  # Fixed window size to prevent resizing across monitors
         
         # Create central widget and layout
         self.central_widget = QWidget()
@@ -115,6 +115,9 @@ class MainWindow(QMainWindow):
         
         # Counters group
         counters_group = QGroupBox("Call Tallies")
+        counters_group.setMinimumHeight(440)  # Adjusted to fit all controls at standard dimensions
+        counters_group.setMaximumHeight(440)  # Prevent growing beyond intended size
+        counters_group.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         counters_layout = QFormLayout(counters_group)
         counters_layout.setSpacing(10)
         # Allow fields in the form to expand horizontally
@@ -134,8 +137,8 @@ class MainWindow(QMainWindow):
             spin_box = QSpinBox()
             spin_box.setMinimum(0)
             spin_box.setMaximum(999)
-            spin_box.setMinimumHeight(28)
-            spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            spin_box.setMinimumHeight(32)  # Increased minimum height for better visibility
+            spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)  # Prevent shrinking below minimum height
             spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
             spin_box.valueChanged.connect(self.mark_dirty)
             counter_layout.addWidget(spin_box)

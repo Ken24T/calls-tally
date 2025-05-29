@@ -26,7 +26,7 @@ def main():
         os.makedirs('data')
     
     # Ensure external (writable) JSON files exist.
-    external_data_folder = ensure_external_data()
+    ensure_external_data()
     
     app = QApplication(sys.argv)
     
