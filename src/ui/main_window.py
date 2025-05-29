@@ -212,7 +212,7 @@ class MainWindow(QMainWindow):
         }
         self.data_manager.save_entry(entry_data)
         print("Autosave triggered. Entry data:", entry_data)
-        QApplication.beep()
+        # Removed QApplication.beep() to eliminate sound
         self.dirty = False
     
     def load_user_entry(self):
