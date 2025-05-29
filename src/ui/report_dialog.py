@@ -1,11 +1,9 @@
-from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
+from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QLabel, 
                            QDateEdit, QPushButton, QTextEdit, QLineEdit,
                            QMessageBox, QFormLayout, QSizePolicy)
-from PyQt6.QtCore import Qt, QDate
-import smtplib
+from PyQt6.QtCore import QDate
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import datetime
 import json
 import os
 
@@ -115,7 +113,7 @@ class ReportDialog(QDialog):
                     overall_totals[key] += value
         
         # Generate the report
-        report = f"# Call Tally Report\n"
+        report = "# Call Tally Report\n"
         report += f"Period: {start_date_str} to {end_date_str}\n\n"
         
         report += "## Overall Totals\n"

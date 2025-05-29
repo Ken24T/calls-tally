@@ -35,7 +35,8 @@ def main():
     # Added "--add-data" for styles.qss so that it is included alongside the executable.
     cmd = [
         sys.executable, "-m", "PyInstaller",
-        "--onefile", "--noconsole",
+        "--noconsole",
+        "--name", "CallTally",
         "--add-data", r"styles.qss;.",     # Include stylesheet in the root
         "--add-data", r"data\*.json;data",
         "app.py"

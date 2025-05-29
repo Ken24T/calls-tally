@@ -1,12 +1,10 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-    QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QDialog, 
-    QLineEdit, QListWidget, QListWidgetItem, QFormLayout, QSpinBox, QGroupBox, 
-    QToolBar, QMenu, QMenuBar, QTabWidget, QCalendarWidget, QInputDialog, QSizePolicy, QApplication)
-from PyQt6.QtGui import QIcon, QAction, QTextCharFormat, QFont, QTextCharFormat, QFont  # added QTextCharFormat, QFont
-from PyQt6.QtCore import Qt, QDate
+    QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QFormLayout, QSpinBox, QGroupBox, 
+    QInputDialog, QSizePolicy, QApplication)
+from PyQt6.QtGui import QAction, QTextCharFormat, QFont  # added QTextCharFormat, QFont
+from PyQt6.QtCore import QDate
 from src.data.data_manager import DataManager
 from src.ui.report_dialog import ReportDialog
-import datetime
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -291,8 +289,8 @@ class MainWindow(QMainWindow):
                 if qdate.isValid():
                     calendar.setDateTextFormat(qdate, boldFormat)
     
-    def closeEvent(self, event):
-        event.accept()
+    def closeEvent(self, a0):
+        a0.accept()
     
     def autosave(self):
         self.save_data()
