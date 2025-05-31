@@ -3,13 +3,18 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QInputDialog, QSizePolicy, QApplication)
 from PyQt6.QtGui import QAction, QTextCharFormat, QFont  # added QTextCharFormat, QFont
 from PyQt6.QtCore import QDate
-from src.data.data_manager import DataManager
 from src.ui.report_dialog import ReportDialog
+from src.data.data_manager import DataManager
+from src.settings.settings_manager import SettingsManager
+from src.ui.settings_dialog import SettingsDialog
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # Autosave on every change; no dirty flag needed.
+        
+        # Initialize settings manager
+        self.settings_manager = SettingsManager()
         
         # Initialize data manager
         self.data_manager = DataManager('data/tally_data.json')
@@ -17,6 +22,9 @@ class MainWindow(QMainWindow):
         # Set up the main window
         self.setWindowTitle("Calls Tally App")
         self.setFixedSize(300, 900)  # Fixed window size to prevent resizing across monitors
+        
+        # Apply window position if remember setting is enabled
+        self.apply_window_position()
         
         # Create central widget and layout
         self.central_widget = QWidget()
@@ -59,21 +67,28 @@ class MainWindow(QMainWindow):
     def create_menus(self):
         # Create menu bar
         menu_bar = self.menuBar()
-        
         # Users menu
         users_menu = menu_bar.addMenu("Users")
-        
         add_user_action = QAction("Add User", self)
         add_user_action.triggered.connect(self.add_user)
         users_menu.addAction(add_user_action)
         
+        # Edit menu
+        edit_menu = menu_bar.addMenu("Edit")
+        settings_action = QAction("Settings", self)
+        settings_action.triggered.connect(self.show_settings_dialog)
+        edit_menu.addAction(settings_action)
+        
         # Reports menu
         reports_menu = menu_bar.addMenu("Reports")
-        
         self.generate_report_action = QAction("Generate Report", self)
         self.generate_report_action.triggered.connect(self.show_report_dialog)
         reports_menu.addAction(self.generate_report_action)
         self.generate_report_action.setEnabled(False)
+
+    def show_settings_dialog(self):
+        settings_dialog = SettingsDialog(self.settings_manager, self)
+        settings_dialog.exec()
 
     def create_form(self):
         # User selection
@@ -214,7 +229,6 @@ class MainWindow(QMainWindow):
             **counter_data
         }
         self.data_manager.save_entry(entry_data)
-        print("Autosave triggered. Entry data:", entry_data)
         # Removed QApplication.beep() to eliminate sound
         self.dirty = False
     
@@ -293,8 +307,9 @@ class MainWindow(QMainWindow):
                     calendar.setDateTextFormat(qdate, boldFormat)
     
     def closeEvent(self, a0):
+        self.save_window_position()
         a0.accept()
-    
+
     def autosave(self):
         self.save_data()
         self.dirty = False
@@ -305,7 +320,56 @@ class MainWindow(QMainWindow):
 
     def handle_done(self):
         if self.dirty:
-            reply = QMessageBox.question(self, "Unsaved Changes", "You have unsaved changes. Are you sure you want to exit?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            reply = QMessageBox.question(
+                self, 
+                "Unsaved Changes", 
+                "You have unsaved changes. Are you sure you want to exit?", 
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
             if reply == QMessageBox.StandardButton.No:
                 return
+        self.save_window_position()
         QApplication.quit()
+
+    def apply_window_position(self):
+        if self.settings_manager.get('remember_window_position', False):
+            position = self.settings_manager.get('window_position', {'x': 100, 'y': 100, 'screen_name': ''})
+            if position:
+                # Try to find the screen by name first
+                screen_name = position.get('screen_name', '')
+                target_screen = None
+                
+                if screen_name:
+                    from PyQt6.QtGui import QGuiApplication
+                    for screen in QGuiApplication.screens():
+                        if screen.name() == screen_name:
+                            target_screen = screen
+                            break
+                
+                # If screen found, move to that screen, otherwise use current screen
+                x = position.get('x', 100)
+                y = position.get('y', 100)
+                
+                # Ensure position is within screen bounds
+                if target_screen:
+                    geometry = target_screen.availableGeometry()
+                    x = max(geometry.x(), min(x, geometry.x() + geometry.width() - self.width()))
+                    y = max(geometry.y(), min(y, geometry.y() + geometry.height() - self.height()))
+                
+                self.move(x, y)
+
+    def save_window_position(self):
+        if self.settings_manager.get('remember_window_position', False):
+            from PyQt6.QtGui import QGuiApplication
+            pos = self.pos()
+            
+            # Find which screen the window is currently on
+            current_screen = QGuiApplication.screenAt(pos)
+            screen_name = current_screen.name() if current_screen else ''
+            
+            position_data = {
+                'x': pos.x(),
+                'y': pos.y(),
+                'screen_name': screen_name
+            }
+            self.settings_manager.set('window_position', position_data)

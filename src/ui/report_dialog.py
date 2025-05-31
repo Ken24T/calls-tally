@@ -1,11 +1,9 @@
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QLabel, 
                            QDateEdit, QPushButton, QTextEdit, QLineEdit,
-                           QMessageBox, QFormLayout, QSizePolicy)
+                           QMessageBox, QFormLayout, QSizePolicy, QHBoxLayout)
 from PyQt6.QtCore import QDate
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-import json
-import os
+import webbrowser
+import urllib.parse # Re-add for mailto URL encoding
 
 class ReportDialog(QDialog):
     def __init__(self, data_manager):
@@ -13,7 +11,7 @@ class ReportDialog(QDialog):
         self.data_manager = data_manager
         
         self.setWindowTitle("Generate Report")
-        self.setMinimumSize(300, 400)  # Lower minimum width for horizontal resizing
+        self.setMinimumSize(300, 400)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
         layout = QVBoxLayout(self)
@@ -22,8 +20,8 @@ class ReportDialog(QDialog):
         date_form = QFormLayout()
         
         self.start_date = QDateEdit()
-        # Default to start of current week (Monday)
         current_date = QDate.currentDate()
+        # Monday of the current week (dayOfWeek() is 1 for Monday, 7 for Sunday)
         start_of_week = current_date.addDays(1 - current_date.dayOfWeek())
         self.start_date.setDate(start_of_week)
         self.start_date.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
@@ -31,7 +29,9 @@ class ReportDialog(QDialog):
         date_form.addRow("Start Date:", self.start_date)
         
         self.end_date = QDateEdit()
-        self.end_date.setDate(QDate.currentDate())
+        # Sunday of the current week
+        end_of_week = current_date.addDays(7 - current_date.dayOfWeek())
+        self.end_date.setDate(end_of_week) # Set to Sunday of the current week
         self.end_date.setCalendarPopup(True)
         self.end_date.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         date_form.addRow("End Date:", self.end_date)
@@ -48,14 +48,13 @@ class ReportDialog(QDialog):
         self.report_display = QTextEdit()
         self.report_display.setReadOnly(True)
         self.report_display.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        layout.addWidget(self.report_display)
-        
-        # Email options
+        layout.addWidget(self.report_display)        # Email options
         email_layout = QFormLayout()
         
         self.email_to = QLineEdit()
         self.email_to.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        # Set default recipient emails if stored in data/default_emails.json
+        self.email_to.setPlaceholderText("Optional: Enter recipient email")
+        # Set default recipient emails from settings
         default_emails = self.load_default_emails()
         if default_emails:
             self.email_to.setText(default_emails)
@@ -63,17 +62,27 @@ class ReportDialog(QDialog):
         
         layout.addLayout(email_layout)
         
-        # Send button
-        self.send_btn = QPushButton("Send Report")
+        # Buttons layout
+        buttons_layout = QHBoxLayout()
+        buttons_layout.addStretch() # Add stretch to push buttons to the right
+
+        self.send_btn = QPushButton("Send Report via Email")
         self.send_btn.clicked.connect(self.send_report)
-        self.send_btn.setEnabled(False)  # Disabled until report is generated
-        layout.addWidget(self.send_btn)
+        self.send_btn.setEnabled(False)
+        self.send_btn.setStyleSheet("background-color: #ADD8E6;") # Example color
+        buttons_layout.addWidget(self.send_btn)
+
+        done_button = QPushButton("Done")
+        done_button.clicked.connect(self.accept) # Changed from self.close to self.accept for standard dialog behavior
+        done_button.setStyleSheet("background-color: #ADD8E6;") # Example color
+        buttons_layout.addWidget(done_button)
+        
+        layout.addLayout(buttons_layout) # Add the horizontal buttons layout to the main vertical layout
     
     def generate_report(self):
         start_date_str = self.start_date.date().toString("yyyy-MM-dd")
         end_date_str = self.end_date.date().toString("yyyy-MM-dd")
         
-        # Get data for the date range
         data = self.data_manager.get_data_for_date_range(start_date_str, end_date_str)
         
         if not data:
@@ -81,7 +90,6 @@ class ReportDialog(QDialog):
             self.send_btn.setEnabled(False)
             return
         
-        # Initialize aggregators
         user_totals = {}
         date_totals = {}
         overall_totals = {
@@ -90,121 +98,85 @@ class ReportDialog(QDialog):
             "appointments": 0, "cma": 0, "appraisals": 0, "tasks": 0
         }
         
-        # Aggregate data ensuring numeric conversion
         for entry in data:
             user = entry["user"]
-            date = entry["date"]
+            date_val = entry["date"]
             
-            # Initialize user and date dictionaries if they don't exist
             if user not in user_totals:
                 user_totals[user] = {k: 0 for k in overall_totals.keys()}
-            if date not in date_totals:
-                date_totals[date] = {k: 0 for k in overall_totals.keys()}
+            if date_val not in date_totals:
+                date_totals[date_val] = {k: 0 for k in overall_totals.keys()}
             
-            # Aggregate the data
             for key in overall_totals.keys():
                 if key in entry:
                     try:
                         value = int(entry.get(key, 0))
-                    except Exception:
+                    except (ValueError, TypeError):
                         value = 0
                     user_totals[user][key] += value
-                    date_totals[date][key] += value
+                    date_totals[date_val][key] += value
                     overall_totals[key] += value
         
-        # Generate the report
-        report = "# Call Tally Report\n"
-        report += f"Period: {start_date_str} to {end_date_str}\n\n"
-        
-        report += "## Overall Totals\n"
+        # Generate the plain text report
+        report_lines = []
+        report_lines.append("Call Tally Report")
+        report_lines.append(f"Period: {start_date_str} to {end_date_str}")
+        report_lines.append("\nOverall Totals:")
         for key, value in overall_totals.items():
-            report += f"{key.replace('_', ' ').title()}: {value}\n"
+            report_lines.append(f"  {key.replace('_', ' ').title()}: {value}")
         
-        report += "\n## User Breakdown\n"
+        report_lines.append("\nUser Breakdown:")
         for user, totals in user_totals.items():
-            report += f"\n### {user}\n"
+            report_lines.append(f"  {user}:")
             for key, value in totals.items():
-                report += f"{key.replace('_', ' ').title()}: {value}\n"
+                report_lines.append(f"    {key.replace('_', ' ').title()}: {value}")
         
-        report += "\n## Daily Breakdown\n"
-        for date in sorted(date_totals.keys()):
-            report += f"\n### {date}\n"
-            totals = date_totals[date]
+        report_lines.append("\nDaily Breakdown:")
+        sorted_dates = sorted(date_totals.keys())
+        for date_key in sorted_dates:
+            report_lines.append(f"  {date_key}:")
+            totals = date_totals[date_key]
             for key, value in totals.items():
-                report += f"{key.replace('_', ' ').title()}: {value}\n"
+                report_lines.append(f"    {key.replace('_', ' ').title()}: {value}")
         
-        self.report_display.setText(report)
+        report_text = "\n".join(report_lines)
+        
+        self.report_display.setText(report_text) # Use setText for plain text
+        self.current_generated_text = report_text # Store for sending
         self.send_btn.setEnabled(True)
-        self.current_report = report
-    
+
     def send_report(self):
-        if not hasattr(self, 'current_report'):
-            QMessageBox.warning(self, "Error", "Please generate a report first")
-            return
-        
-        to_email = self.email_to.text().strip()
-        if not to_email:
-            QMessageBox.warning(self, "Error", "Please enter a recipient email address")
-            return
-        
-        # Load email settings
         try:
-            # In a real application, you would store these securely, not in the code
-            # This is just a placeholder implementation
-            
-            # Check if we have stored SMTP settings
-            settings_file = "data/email_settings.json"
-            if os.path.exists(settings_file):
-                with open(settings_file, 'r') as f:
-                    settings = json.load(f)
-                    smtp_server = settings.get('smtp_server')
-                    smtp_port = settings.get('smtp_port')
-                    smtp_user = settings.get('smtp_user')
-                    smtp_password = settings.get('smtp_password')
-                    from_email = settings.get('from_email')
-            else:
-                # Prompt for settings in a real app
-                QMessageBox.information(
-                    self, 
-                    "Email Setup Required", 
-                    "Email settings not configured. Please set up SMTP details in Settings menu."
-                )
+            if not hasattr(self, 'current_generated_text') or not self.current_generated_text.strip():
+                QMessageBox.warning(self, "Warning", "No report content to send. Please generate a report first.")
                 return
-                
-            # Create report email
-            msg = MIMEMultipart()
-            msg['From'] = from_email
-            msg['To'] = to_email
-            msg['Subject'] = f"Call Tally Report {self.start_date.date().toString('yyyy-MM-dd')} to {self.end_date.date().toString('yyyy-MM-dd')}"
             
-            # Convert report to HTML
-            html_report = "<html><body><pre>" + self.current_report + "</pre></body></html>"
-            msg.attach(MIMEText(html_report, 'html'))
+            report_plain_text = self.current_generated_text
             
-            # This would send the email in a real application
-            # with smtplib.SMTP(smtp_server, smtp_port) as server:
-            #     server.login(smtp_user, smtp_password)
-            #     server.send_message(msg)
+            to_email = self.email_to.text().strip()
+            start_date_str = self.start_date.date().toString("yyyy-MM-dd")
+            end_date_str = self.end_date.date().toString("yyyy-MM-dd")
+            subject = f"Call Tally Report {start_date_str} to {end_date_str}"
+
+            mailto_parts = []
+            if to_email:
+                # Handle multiple recipients if your UI supports it (e.g., semicolon separated)
+                recipients = [r.strip() for r in to_email.split(';') if r.strip()]
+                if recipients:
+                    mailto_parts.append(",".join(recipients)) # mailto typically uses comma for multiple To's
             
-            # For demonstration, we'll just show success
-            QMessageBox.information(
-                self, 
-                "Success", 
-                f"Report would be sent to {to_email} in a real application.\n\n"
-                "This is a placeholder for email functionality.\n\n"
-                "For a complete implementation, you would need to configure SMTP settings."
-            )
+            # Encode subject and body for the mailto URL
+            encoded_subject = urllib.parse.quote(subject)
+            encoded_body = urllib.parse.quote(report_plain_text)
             
+            mailto_url = f"mailto:{';'.join(mailto_parts)}?subject={encoded_subject}&body={encoded_body}"
+            
+            webbrowser.open(mailto_url)
+
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to send email: {str(e)}")
-    
+            QMessageBox.critical(self, "Error Opening Email Client", f"Failed to open email client: {str(e)}")
+
     def load_default_emails(self):
-        settings_file = "data/default_emails.json"
-        if os.path.exists(settings_file):
-            try:
-                with open(settings_file, 'r') as f:
-                    data = json.load(f)
-                return data.get("default_emails", "")
-            except Exception:
-                return ""
-        return ""
+        from src.settings.settings_manager import SettingsManager
+        settings_manager = SettingsManager()
+        return settings_manager.get('default_emails', '')
