@@ -36,7 +36,7 @@ def main():
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--noconsole",
-        "--name", "CallTally",
+        "--name", "CallsTally",
         "--add-data", r"styles.qss;.",     # Include stylesheet in the root
         "--add-data", r"data\*.json;data",
         "app.py"
