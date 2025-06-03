@@ -32,19 +32,6 @@ def main():
         sys.exit(1)
     clean_previous_builds()
 
-    python_major = sys.version_info.major
-    python_minor = sys.version_info.minor
-    python_dll_name = f"python{python_major}{python_minor}.dll"  # e.g., python312.dll
-    # Use sys.base_prefix to get the root of the Python installation
-    # This is more reliable for finding core DLLs, especially with venvs or store Python
-    python_dir = sys.base_prefix 
-    python_dll_path = os.path.join(python_dir, python_dll_name)
-
-    # If the DLL is in a 'DLLs' subdirectory of sys.base_prefix, adjust path:
-    if not os.path.exists(python_dll_path) and os.path.exists(os.path.join(python_dir, "DLLs", python_dll_name)):
-        python_dll_path = os.path.join(python_dir, "DLLs", python_dll_name)
-
-
     # Run PyInstaller using the current interpreter.
     cmd = [
         sys.executable, "-m", "PyInstaller",
@@ -53,14 +40,6 @@ def main():
         "--add-data", r"styles.qss;.",     # Include stylesheet in the root
         "--add-data", r"data\*.json;data",
     ]
-
-    if os.path.exists(python_dll_path):
-        # Use ';' as the separator for source and destination on Windows for --add-binary
-        cmd.extend(["--add-binary", f"{python_dll_path};."])
-        print(f"Attempting to add binary: {python_dll_path}")
-    else:
-        print(f"Warning: Python DLL {python_dll_path} not found. Skipping --add-binary for it.")
-        print(f"Please ensure that {python_dll_name} is in the directory {python_dir} or that your Python installation is correct.")
 
     cmd.append("app.py")
 
