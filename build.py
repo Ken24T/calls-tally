@@ -31,16 +31,32 @@ def main():
     if not check_git_clean():
         sys.exit(1)
     clean_previous_builds()
+
+    python_major = sys.version_info.major
+    python_minor = sys.version_info.minor
+    python_dll_name = f"python{python_major}{python_minor}.dll"  # e.g., python312.dll
+    python_dir = os.path.dirname(sys.executable)  # Directory where python.exe is
+    python_dll_path = os.path.join(python_dir, python_dll_name)
+
     # Run PyInstaller using the current interpreter.
-    # Added "--add-data" for styles.qss so that it is included alongside the executable.
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--noconsole",
         "--name", "CallsTally",
         "--add-data", r"styles.qss;.",     # Include stylesheet in the root
         "--add-data", r"data\*.json;data",
-        "app.py"
     ]
+
+    if os.path.exists(python_dll_path):
+        # Use ';' as the separator for source and destination on Windows for --add-binary
+        cmd.extend(["--add-binary", f"{python_dll_path};."])
+        print(f"Attempting to add binary: {python_dll_path}")
+    else:
+        print(f"Warning: Python DLL {python_dll_path} not found. Skipping --add-binary for it.")
+        print(f"Please ensure that {python_dll_name} is in the directory {python_dir} or that your Python installation is correct.")
+
+    cmd.append("app.py")
+
     result = subprocess.run(cmd)
     if result.returncode != 0:
         print("Build failed.")
