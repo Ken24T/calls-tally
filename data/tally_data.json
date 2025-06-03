@@ -1,11 +1,10 @@
 {
   "users": [
-	  "Doug"	
-	],
+    "Doug"
+  ],
   "entries": [
     {
-      "#": 466,
-      "Date": "2025-06-03T00:00:00",
+      "Date": "2025-06-03",
       "Caller": "Doug",
       "Calls": 3,
       "Connections": 1,
@@ -13,7 +12,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -21,8 +20,7 @@
       "Comments": "75/"
     },
     {
-      "#": 465,
-      "Date": "2025-05-30T00:00:00",
+      "Date": "2025-05-30",
       "Caller": "Doug",
       "Calls": 12,
       "Connections": 6,
@@ -30,7 +28,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -38,8 +36,7 @@
       "Comments": "45/24"
     },
     {
-      "#": 464,
-      "Date": "2025-05-29T00:00:00",
+      "Date": "2025-05-29",
       "Caller": "Doug",
       "Calls": 8,
       "Connections": 4,
@@ -47,7 +44,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -55,8 +52,7 @@
       "Comments": "66/23"
     },
     {
-      "#": 463,
-      "Date": "2025-05-28T00:00:00",
+      "Date": "2025-05-28",
       "Caller": "Doug",
       "Calls": 10,
       "Connections": 4,
@@ -64,7 +60,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -72,8 +68,7 @@
       "Comments": "84/37"
     },
     {
-      "#": 462,
-      "Date": "2025-05-27T00:00:00",
+      "Date": "2025-05-27",
       "Caller": "Doug",
       "Calls": 18,
       "Connections": 14,
@@ -81,7 +76,7 @@
       "SMS": 5,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -89,8 +84,7 @@
       "Comments": "77/60"
     },
     {
-      "#": 461,
-      "Date": "2025-05-23T00:00:00",
+      "Date": "2025-05-23",
       "Caller": "Doug",
       "Calls": 1,
       "Connections": 0,
@@ -98,7 +92,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -106,8 +100,7 @@
       "Comments": "66/54"
     },
     {
-      "#": 460,
-      "Date": "2025-05-22T00:00:00",
+      "Date": "2025-05-22",
       "Caller": "Doug",
       "Calls": 3,
       "Connections": 2,
@@ -115,7 +108,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -123,8 +116,7 @@
       "Comments": "84/52"
     },
     {
-      "#": 459,
-      "Date": "2025-05-21T00:00:00",
+      "Date": "2025-05-21",
       "Caller": "Doug",
       "Calls": 10,
       "Connections": 7,
@@ -132,7 +124,7 @@
       "SMS": 0,
       "CMA": 1,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 1,
       "Appointments": 1,
       "Appraisals": 0,
@@ -140,8 +132,7 @@
       "Comments": "82/60"
     },
     {
-      "#": 458,
-      "Date": "2025-05-20T00:00:00",
+      "Date": "2025-05-20",
       "Caller": "Doug",
       "Calls": 10,
       "Connections": 6,
@@ -149,7 +140,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 1,
@@ -157,8 +148,7 @@
       "Comments": "81/62"
     },
     {
-      "#": 457,
-      "Date": "2025-05-16T00:00:00",
+      "Date": "2025-05-16",
       "Caller": "Doug",
       "Calls": 3,
       "Connections": 2,
@@ -166,7 +156,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -174,8 +164,7 @@
       "Comments": "59/52"
     },
     {
-      "#": 456,
-      "Date": "2025-05-15T00:00:00",
+      "Date": "2025-05-15",
       "Caller": "Doug",
       "Calls": 22,
       "Connections": 16,
@@ -183,7 +172,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -191,8 +180,7 @@
       "Comments": "84/47"
     },
     {
-      "#": 455,
-      "Date": "2025-05-14T00:00:00",
+      "Date": "2025-05-14",
       "Caller": "Doug",
       "Calls": 20,
       "Connections": 11,
@@ -200,7 +188,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -208,8 +196,7 @@
       "Comments": "105/66"
     },
     {
-      "#": 454,
-      "Date": "2025-05-13T00:00:00",
+      "Date": "2025-05-13",
       "Caller": "Doug",
       "Calls": 13,
       "Connections": 8,
@@ -217,7 +204,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 1,
@@ -225,8 +212,7 @@
       "Comments": "96/85"
     },
     {
-      "#": 453,
-      "Date": "2025-05-09T00:00:00",
+      "Date": "2025-05-09",
       "Caller": "Doug",
       "Calls": 8,
       "Connections": 4,
@@ -234,7 +220,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -242,8 +228,7 @@
       "Comments": "81/62"
     },
     {
-      "#": 452,
-      "Date": "2025-05-08T00:00:00",
+      "Date": "2025-05-08",
       "Caller": "Doug",
       "Calls": 7,
       "Connections": 4,
@@ -251,7 +236,7 @@
       "SMS": 0,
       "CMA": 2,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 2,
@@ -259,8 +244,7 @@
       "Comments": "84/75"
     },
     {
-      "#": 451,
-      "Date": "2025-05-07T00:00:00",
+      "Date": "2025-05-07",
       "Caller": "Doug",
       "Calls": 0,
       "Connections": 0,
@@ -268,7 +252,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -276,8 +260,7 @@
       "Comments": null
     },
     {
-      "#": 450,
-      "Date": "2025-04-30T00:00:00",
+      "Date": "2025-04-30",
       "Caller": "Doug",
       "Calls": 0,
       "Connections": 0,
@@ -285,7 +268,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -293,8 +276,7 @@
       "Comments": "94/42"
     },
     {
-      "#": 449,
-      "Date": "2025-04-29T00:00:00",
+      "Date": "2025-04-29",
       "Caller": "Doug",
       "Calls": 4,
       "Connections": 4,
@@ -302,7 +284,7 @@
       "SMS": 35,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -310,8 +292,7 @@
       "Comments": "145/77"
     },
     {
-      "#": 448,
-      "Date": "2025-04-24T00:00:00",
+      "Date": "2025-04-24",
       "Caller": "Doug",
       "Calls": 8,
       "Connections": 6,
@@ -319,7 +300,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -327,8 +308,7 @@
       "Comments": "141/115"
     },
     {
-      "#": 447,
-      "Date": "2025-04-23T00:00:00",
+      "Date": "2025-04-23",
       "Caller": "Doug",
       "Calls": 2,
       "Connections": 2,
@@ -336,7 +316,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -344,8 +324,7 @@
       "Comments": "158/132"
     },
     {
-      "#": 446,
-      "Date": "2025-04-22T00:00:00",
+      "Date": "2025-04-22",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 3,
@@ -353,7 +332,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -361,8 +340,7 @@
       "Comments": "234/142"
     },
     {
-      "#": 445,
-      "Date": "2025-04-17T00:00:00",
+      "Date": "2025-04-17",
       "Caller": "Doug",
       "Calls": 3,
       "Connections": 2,
@@ -370,7 +348,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -378,8 +356,7 @@
       "Comments": "261/194"
     },
     {
-      "#": 444,
-      "Date": "2025-04-16T00:00:00",
+      "Date": "2025-04-16",
       "Caller": "Doug",
       "Calls": 4,
       "Connections": 4,
@@ -387,7 +364,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -395,8 +372,7 @@
       "Comments": "277/258"
     },
     {
-      "#": 443,
-      "Date": "2025-04-15T00:00:00",
+      "Date": "2025-04-15",
       "Caller": "Doug",
       "Calls": 13,
       "Connections": 2,
@@ -404,7 +380,7 @@
       "SMS": 5,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -412,8 +388,7 @@
       "Comments": "292/258"
     },
     {
-      "#": 442,
-      "Date": "2025-04-14T00:00:00",
+      "Date": "2025-04-14",
       "Caller": "Doug",
       "Calls": 3,
       "Connections": 1,
@@ -421,7 +396,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -429,8 +404,7 @@
       "Comments": "301/282"
     },
     {
-      "#": 441,
-      "Date": "2025-04-11T00:00:00",
+      "Date": "2025-04-11",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 2,
@@ -438,7 +412,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -446,8 +420,7 @@
       "Comments": "292/287"
     },
     {
-      "#": 440,
-      "Date": "2025-04-10T00:00:00",
+      "Date": "2025-04-10",
       "Caller": "Doug",
       "Calls": 11,
       "Connections": 7,
@@ -455,7 +428,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -463,8 +436,7 @@
       "Comments": "314/"
     },
     {
-      "#": 439,
-      "Date": "2025-04-09T00:00:00",
+      "Date": "2025-04-09",
       "Caller": "Doug",
       "Calls": 10,
       "Connections": 4,
@@ -472,7 +444,7 @@
       "SMS": 8,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -480,8 +452,7 @@
       "Comments": "351/322"
     },
     {
-      "#": 438,
-      "Date": "2025-04-03T00:00:00",
+      "Date": "2025-04-03",
       "Caller": "Doug",
       "Calls": 11,
       "Connections": 5,
@@ -489,7 +460,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 1,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 2,
       "Appraisals": 0,
@@ -497,8 +468,7 @@
       "Comments": "255/228"
     },
     {
-      "#": 437,
-      "Date": "2025-04-02T00:00:00",
+      "Date": "2025-04-02",
       "Caller": "Doug",
       "Calls": 15,
       "Connections": 8,
@@ -506,7 +476,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 1,
       "Appraisals": 0,
@@ -514,8 +484,7 @@
       "Comments": "283/249"
     },
     {
-      "#": 436,
-      "Date": "2025-04-01T00:00:00",
+      "Date": "2025-04-01",
       "Caller": "Doug",
       "Calls": 2,
       "Connections": 1,
@@ -523,7 +492,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -531,8 +500,7 @@
       "Comments": "303/"
     },
     {
-      "#": 435,
-      "Date": "2025-03-31T00:00:00",
+      "Date": "2025-03-31",
       "Caller": "Doug",
       "Calls": 22,
       "Connections": 12,
@@ -540,7 +508,7 @@
       "SMS": 6,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -548,8 +516,7 @@
       "Comments": "320/279"
     },
     {
-      "#": 434,
-      "Date": "2025-03-28T00:00:00",
+      "Date": "2025-03-28",
       "Caller": "Doug",
       "Calls": 4,
       "Connections": 3,
@@ -557,7 +524,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 1,
       "Appraisals": 1,
@@ -565,8 +532,7 @@
       "Comments": null
     },
     {
-      "#": 433,
-      "Date": "2025-03-26T00:00:00",
+      "Date": "2025-03-26",
       "Caller": "Doug",
       "Calls": 8,
       "Connections": 4,
@@ -574,7 +540,7 @@
       "SMS": 5,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 1,
       "Appraisals": 0,
@@ -582,8 +548,7 @@
       "Comments": "379/364"
     },
     {
-      "#": 432,
-      "Date": "2025-03-25T00:00:00",
+      "Date": "2025-03-25",
       "Caller": "Doug",
       "Calls": 37,
       "Connections": 14,
@@ -591,7 +556,7 @@
       "SMS": 14,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 2,
       "Appraisals": 1,
@@ -599,8 +564,7 @@
       "Comments": "410/392"
     },
     {
-      "#": 431,
-      "Date": "2025-03-24T00:00:00",
+      "Date": "2025-03-24",
       "Caller": "Doug",
       "Calls": 25,
       "Connections": 10,
@@ -608,7 +572,7 @@
       "SMS": 11,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 1,
@@ -616,8 +580,7 @@
       "Comments": "437/"
     },
     {
-      "#": 430,
-      "Date": "2025-03-21T00:00:00",
+      "Date": "2025-03-21",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 3,
@@ -625,7 +588,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -633,8 +596,7 @@
       "Comments": "407/"
     },
     {
-      "#": 429,
-      "Date": "2025-03-20T00:00:00",
+      "Date": "2025-03-20",
       "Caller": "Doug",
       "Calls": 7,
       "Connections": 4,
@@ -642,7 +604,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -650,8 +612,7 @@
       "Comments": "422"
     },
     {
-      "#": 428,
-      "Date": "2025-03-19T00:00:00",
+      "Date": "2025-03-19",
       "Caller": "Doug",
       "Calls": 0,
       "Connections": 0,
@@ -659,7 +620,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -667,8 +628,7 @@
       "Comments": null
     },
     {
-      "#": 427,
-      "Date": "2025-03-18T00:00:00",
+      "Date": "2025-03-18",
       "Caller": "Doug",
       "Calls": 4,
       "Connections": 4,
@@ -676,7 +636,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -684,8 +644,7 @@
       "Comments": "350"
     },
     {
-      "#": 426,
-      "Date": "2025-03-17T00:00:00",
+      "Date": "2025-03-17",
       "Caller": "Doug",
       "Calls": 24,
       "Connections": 13,
@@ -693,7 +652,7 @@
       "SMS": 12,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 3,
       "Appraisals": 2,
@@ -701,8 +660,7 @@
       "Comments": null
     },
     {
-      "#": 425,
-      "Date": "2025-03-13T00:00:00",
+      "Date": "2025-03-13",
       "Caller": "Doug",
       "Calls": 0,
       "Connections": 0,
@@ -710,7 +668,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -718,8 +676,7 @@
       "Comments": null
     },
     {
-      "#": 424,
-      "Date": "2025-03-12T00:00:00",
+      "Date": "2025-03-12",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 0,
@@ -727,7 +684,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -735,8 +692,7 @@
       "Comments": "1319"
     },
     {
-      "#": 423,
-      "Date": "2025-03-10T00:00:00",
+      "Date": "2025-03-10",
       "Caller": "Doug",
       "Calls": 1,
       "Connections": 1,
@@ -744,7 +700,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 1,
@@ -752,8 +708,7 @@
       "Comments": null
     },
     {
-      "#": 422,
-      "Date": "2025-03-05T00:00:00",
+      "Date": "2025-03-05",
       "Caller": "Doug",
       "Calls": 0,
       "Connections": 0,
@@ -761,7 +716,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -769,8 +724,7 @@
       "Comments": null
     },
     {
-      "#": 421,
-      "Date": "2025-03-04T00:00:00",
+      "Date": "2025-03-04",
       "Caller": "Doug",
       "Calls": 22,
       "Connections": 7,
@@ -778,7 +732,7 @@
       "SMS": 15,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -786,8 +740,7 @@
       "Comments": null
     },
     {
-      "#": 420,
-      "Date": "2025-02-27T00:00:00",
+      "Date": "2025-02-27",
       "Caller": "Doug",
       "Calls": 8,
       "Connections": 6,
@@ -795,7 +748,7 @@
       "SMS": 4,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -803,8 +756,7 @@
       "Comments": null
     },
     {
-      "#": 419,
-      "Date": "2025-02-25T00:00:00",
+      "Date": "2025-02-25",
       "Caller": "Doug",
       "Calls": 21,
       "Connections": 6,
@@ -812,7 +764,7 @@
       "SMS": 12,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -820,8 +772,7 @@
       "Comments": null
     },
     {
-      "#": 418,
-      "Date": "2025-02-20T00:00:00",
+      "Date": "2025-02-20",
       "Caller": "Doug",
       "Calls": 11,
       "Connections": 10,
@@ -829,7 +780,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 2,
       "Appraisals": 0,
@@ -837,8 +788,7 @@
       "Comments": null
     },
     {
-      "#": 417,
-      "Date": "2025-02-19T00:00:00",
+      "Date": "2025-02-19",
       "Caller": "Doug",
       "Calls": 6,
       "Connections": 5,
@@ -846,7 +796,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -854,8 +804,7 @@
       "Comments": "1018/1015"
     },
     {
-      "#": 416,
-      "Date": "2025-02-18T00:00:00",
+      "Date": "2025-02-18",
       "Caller": "Doug",
       "Calls": 3,
       "Connections": 1,
@@ -863,7 +812,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -871,8 +820,7 @@
       "Comments": "990/975"
     },
     {
-      "#": 414,
-      "Date": "2025-02-14T00:00:00",
+      "Date": "2025-02-14",
       "Caller": "Doug",
       "Calls": 3,
       "Connections": 3,
@@ -880,7 +828,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -888,8 +836,7 @@
       "Comments": "340/"
     },
     {
-      "#": 413,
-      "Date": "2025-02-13T00:00:00",
+      "Date": "2025-02-13",
       "Caller": "Doug",
       "Calls": 3,
       "Connections": 0,
@@ -897,7 +844,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 1,
       "Appraisals": 1,
@@ -905,8 +852,7 @@
       "Comments": "333/330"
     },
     {
-      "#": 411,
-      "Date": "2025-02-12T00:00:00",
+      "Date": "2025-02-12",
       "Caller": "Doug",
       "Calls": 9,
       "Connections": 3,
@@ -914,7 +860,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -922,8 +868,7 @@
       "Comments": "344/326"
     },
     {
-      "#": 409,
-      "Date": "2025-02-11T00:00:00",
+      "Date": "2025-02-11",
       "Caller": "Doug",
       "Calls": 6,
       "Connections": 3,
@@ -931,7 +876,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -939,8 +884,7 @@
       "Comments": "366/330"
     },
     {
-      "#": 408,
-      "Date": "2025-02-10T00:00:00",
+      "Date": "2025-02-10",
       "Caller": "Doug",
       "Calls": 9,
       "Connections": 3,
@@ -948,7 +892,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -956,8 +900,7 @@
       "Comments": "410/363"
     },
     {
-      "#": 392,
-      "Date": "2025-01-16T00:00:00",
+      "Date": "2025-01-16",
       "Caller": "Doug",
       "Calls": 6,
       "Connections": 3,
@@ -965,7 +908,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -973,8 +916,7 @@
       "Comments": "234/212"
     },
     {
-      "#": 390,
-      "Date": "2025-01-14T00:00:00",
+      "Date": "2025-01-14",
       "Caller": "Doug",
       "Calls": 8,
       "Connections": 4,
@@ -982,7 +924,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 1,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 1,
       "Appraisals": 0,
@@ -990,8 +932,7 @@
       "Comments": "258/210"
     },
     {
-      "#": 387,
-      "Date": "2025-01-13T00:00:00",
+      "Date": "2025-01-13",
       "Caller": "Doug",
       "Calls": 4,
       "Connections": 3,
@@ -999,7 +940,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1007,8 +948,7 @@
       "Comments": "254/249"
     },
     {
-      "#": 386,
-      "Date": "2025-01-10T00:00:00",
+      "Date": "2025-01-10",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 2,
@@ -1016,7 +956,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1024,8 +964,7 @@
       "Comments": "267/234"
     },
     {
-      "#": 385,
-      "Date": "2025-01-09T00:00:00",
+      "Date": "2025-01-09",
       "Caller": "Doug",
       "Calls": 14,
       "Connections": 5,
@@ -1033,7 +972,7 @@
       "SMS": 5,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1041,8 +980,7 @@
       "Comments": "304//254"
     },
     {
-      "#": 384,
-      "Date": "2025-01-08T00:00:00",
+      "Date": "2025-01-08",
       "Caller": "Doug",
       "Calls": 14,
       "Connections": 10,
@@ -1050,7 +988,7 @@
       "SMS": 5,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1058,8 +996,7 @@
       "Comments": "298-271"
     },
     {
-      "#": 383,
-      "Date": "2025-01-07T00:00:00",
+      "Date": "2025-01-07",
       "Caller": "Doug",
       "Calls": 9,
       "Connections": 4,
@@ -1067,7 +1004,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1075,8 +1012,7 @@
       "Comments": "61/51"
     },
     {
-      "#": 382,
-      "Date": "2025-01-03T00:00:00",
+      "Date": "2025-01-03",
       "Caller": "Doug",
       "Calls": 0,
       "Connections": 0,
@@ -1084,7 +1020,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1092,8 +1028,7 @@
       "Comments": null
     },
     {
-      "#": 381,
-      "Date": "2025-01-02T00:00:00",
+      "Date": "2025-01-02",
       "Caller": "Doug",
       "Calls": 2,
       "Connections": 2,
@@ -1101,7 +1036,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1109,8 +1044,7 @@
       "Comments": "47/31"
     },
     {
-      "#": 380,
-      "Date": "2024-12-24T00:00:00",
+      "Date": "2024-12-24",
       "Caller": "Doug",
       "Calls": 6,
       "Connections": 4,
@@ -1118,7 +1052,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1126,8 +1060,7 @@
       "Comments": "60/20"
     },
     {
-      "#": 379,
-      "Date": "2024-12-20T00:00:00",
+      "Date": "2024-12-20",
       "Caller": "Doug",
       "Calls": 1,
       "Connections": 0,
@@ -1135,7 +1068,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1143,8 +1076,7 @@
       "Comments": "7-0"
     },
     {
-      "#": 378,
-      "Date": "2024-12-19T00:00:00",
+      "Date": "2024-12-19",
       "Caller": "Doug",
       "Calls": 6,
       "Connections": 4,
@@ -1152,7 +1084,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1160,8 +1092,7 @@
       "Comments": "10-0"
     },
     {
-      "#": 375,
-      "Date": "2024-12-18T00:00:00",
+      "Date": "2024-12-18",
       "Caller": "Doug",
       "Calls": 10,
       "Connections": 6,
@@ -1169,7 +1100,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1177,8 +1108,7 @@
       "Comments": "18-0"
     },
     {
-      "#": 372,
-      "Date": "2024-12-17T00:00:00",
+      "Date": "2024-12-17",
       "Caller": "Doug",
       "Calls": 14,
       "Connections": 6,
@@ -1186,7 +1116,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 1,
       "Appraisals": 0,
@@ -1194,8 +1124,7 @@
       "Comments": "23-0"
     },
     {
-      "#": 370,
-      "Date": "2024-12-16T00:00:00",
+      "Date": "2024-12-16",
       "Caller": "Doug",
       "Calls": 8,
       "Connections": 4,
@@ -1203,7 +1132,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1211,8 +1140,7 @@
       "Comments": "56 - 0"
     },
     {
-      "#": 368,
-      "Date": "2024-12-14T00:00:00",
+      "Date": "2024-12-14",
       "Caller": "Doug",
       "Calls": 10,
       "Connections": 5,
@@ -1220,7 +1148,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1228,8 +1156,7 @@
       "Comments": "(55)72-47"
     },
     {
-      "#": 367,
-      "Date": "2024-12-13T00:00:00",
+      "Date": "2024-12-13",
       "Caller": "Doug",
       "Calls": 12,
       "Connections": 7,
@@ -1237,7 +1164,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1245,8 +1172,7 @@
       "Comments": "83-61"
     },
     {
-      "#": 365,
-      "Date": "2024-12-12T00:00:00",
+      "Date": "2024-12-12",
       "Caller": "Doug",
       "Calls": 15,
       "Connections": 8,
@@ -1254,7 +1180,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1262,8 +1188,7 @@
       "Comments": "93-62"
     },
     {
-      "#": 362,
-      "Date": "2024-12-11T00:00:00",
+      "Date": "2024-12-11",
       "Caller": "Doug",
       "Calls": 16,
       "Connections": 10,
@@ -1271,7 +1196,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1279,8 +1204,7 @@
       "Comments": "107-87"
     },
     {
-      "#": 361,
-      "Date": "2024-12-10T00:00:00",
+      "Date": "2024-12-10",
       "Caller": "Doug",
       "Calls": 15,
       "Connections": 7,
@@ -1288,7 +1212,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 1,
@@ -1296,8 +1220,7 @@
       "Comments": "115-81"
     },
     {
-      "#": 354,
-      "Date": "2024-12-06T00:00:00",
+      "Date": "2024-12-06",
       "Caller": "Doug",
       "Calls": 7,
       "Connections": 4,
@@ -1305,7 +1228,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1313,8 +1236,7 @@
       "Comments": "96-86"
     },
     {
-      "#": 351,
-      "Date": "2024-12-05T00:00:00",
+      "Date": "2024-12-05",
       "Caller": "Doug",
       "Calls": 33,
       "Connections": 17,
@@ -1322,7 +1244,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1330,8 +1252,7 @@
       "Comments": "121 - 78"
     },
     {
-      "#": 350,
-      "Date": "2024-12-04T00:00:00",
+      "Date": "2024-12-04",
       "Caller": "Doug",
       "Calls": 6,
       "Connections": 4,
@@ -1339,7 +1260,7 @@
       "SMS": 4,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1347,8 +1268,7 @@
       "Comments": "122-110"
     },
     {
-      "#": 347,
-      "Date": "2024-12-03T00:00:00",
+      "Date": "2024-12-03",
       "Caller": "Doug",
       "Calls": 11,
       "Connections": 6,
@@ -1356,7 +1276,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1364,8 +1284,7 @@
       "Comments": "Start 105 - 95"
     },
     {
-      "#": 344,
-      "Date": "2024-11-30T00:00:00",
+      "Date": "2024-11-30",
       "Caller": "Doug",
       "Calls": 1,
       "Connections": 1,
@@ -1373,7 +1292,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1381,8 +1300,7 @@
       "Comments": "78"
     },
     {
-      "#": 343,
-      "Date": "2024-11-29T00:00:00",
+      "Date": "2024-11-29",
       "Caller": "Doug",
       "Calls": 4,
       "Connections": 1,
@@ -1390,7 +1308,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1398,8 +1316,7 @@
       "Comments": "Tasks start: 76 f 58"
     },
     {
-      "#": 341,
-      "Date": "2024-11-28T00:00:00",
+      "Date": "2024-11-28",
       "Caller": "Doug",
       "Calls": 14,
       "Connections": 11,
@@ -1407,7 +1324,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1415,8 +1332,7 @@
       "Comments": "Tasks 151 - end 61"
     },
     {
-      "#": 339,
-      "Date": "2024-11-27T00:00:00",
+      "Date": "2024-11-27",
       "Caller": "Doug",
       "Calls": 9,
       "Connections": 7,
@@ -1424,7 +1340,7 @@
       "SMS": 4,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1432,8 +1348,7 @@
       "Comments": "Task start 154 / 135"
     },
     {
-      "#": 338,
-      "Date": "2024-11-26T00:00:00",
+      "Date": "2024-11-26",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 4,
@@ -1441,7 +1356,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1449,8 +1364,7 @@
       "Comments": "Start 157 Tasks F 138"
     },
     {
-      "#": 334,
-      "Date": "2024-11-22T00:00:00",
+      "Date": "2024-11-22",
       "Caller": "Doug",
       "Calls": 17,
       "Connections": 10,
@@ -1458,7 +1372,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1466,8 +1380,7 @@
       "Comments": "Task start 183 Fin 139"
     },
     {
-      "#": 331,
-      "Date": "2024-11-21T00:00:00",
+      "Date": "2024-11-21",
       "Caller": "Doug",
       "Calls": 15,
       "Connections": 5,
@@ -1475,7 +1388,7 @@
       "SMS": 4,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1483,8 +1396,7 @@
       "Comments": "Start 219 tasks to 178"
     },
     {
-      "#": 329,
-      "Date": "2024-11-20T00:00:00",
+      "Date": "2024-11-20",
       "Caller": "Doug",
       "Calls": 15,
       "Connections": 9,
@@ -1492,7 +1404,7 @@
       "SMS": 4,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1500,8 +1412,7 @@
       "Comments": "Start 255 fin 211"
     },
     {
-      "#": 327,
-      "Date": "2024-11-19T00:00:00",
+      "Date": "2024-11-19",
       "Caller": "Doug",
       "Calls": 6,
       "Connections": 5,
@@ -1509,7 +1420,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1517,8 +1428,7 @@
       "Comments": "Tasks 295 at start 250 end of day"
     },
     {
-      "#": 325,
-      "Date": "2024-11-15T00:00:00",
+      "Date": "2024-11-15",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 3,
@@ -1526,7 +1436,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1534,8 +1444,7 @@
       "Comments": "Start 292 tasks end 281 tasks"
     },
     {
-      "#": 320,
-      "Date": "2024-11-13T00:00:00",
+      "Date": "2024-11-13",
       "Caller": "Doug",
       "Calls": 18,
       "Connections": 11,
@@ -1543,7 +1452,7 @@
       "SMS": 4,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1551,8 +1460,7 @@
       "Comments": "to do list 347 at end of day"
     },
     {
-      "#": 274,
-      "Date": "2024-10-03T00:00:00",
+      "Date": "2024-10-03",
       "Caller": "Doug",
       "Calls": 16,
       "Connections": 6,
@@ -1560,7 +1468,7 @@
       "SMS": 5,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1568,8 +1476,7 @@
       "Comments": null
     },
     {
-      "#": 271,
-      "Date": "2024-09-30T00:00:00",
+      "Date": "2024-09-30",
       "Caller": "Doug",
       "Calls": 4,
       "Connections": 3,
@@ -1577,7 +1484,7 @@
       "SMS": 3,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 1,
       "Appointments": 1,
       "Appraisals": 0,
@@ -1585,8 +1492,7 @@
       "Comments": null
     },
     {
-      "#": 268,
-      "Date": "2024-09-26T00:00:00",
+      "Date": "2024-09-26",
       "Caller": "Doug",
       "Calls": 0,
       "Connections": 0,
@@ -1594,7 +1500,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1602,8 +1508,7 @@
       "Comments": null
     },
     {
-      "#": 266,
-      "Date": "2024-09-25T00:00:00",
+      "Date": "2024-09-25",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 4,
@@ -1611,7 +1516,7 @@
       "SMS": 3,
       "CMA": 1,
       "Form6 Sent": 1,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 1,
       "Appointments": 2,
       "Appraisals": 1,
@@ -1619,8 +1524,7 @@
       "Comments": "129 Fernberg"
     },
     {
-      "#": 265,
-      "Date": "2024-09-25T00:00:00",
+      "Date": "2024-09-25",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 4,
@@ -1628,7 +1532,7 @@
       "SMS": 3,
       "CMA": 1,
       "Form6 Sent": 1,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 1,
       "Appointments": 2,
       "Appraisals": 1,
@@ -1636,8 +1540,7 @@
       "Comments": "129 Fernberg"
     },
     {
-      "#": 262,
-      "Date": "2024-09-24T00:00:00",
+      "Date": "2024-09-24",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 3,
@@ -1645,7 +1548,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 1,
       "Appointments": 1,
       "Appraisals": 0,
@@ -1653,8 +1556,7 @@
       "Comments": null
     },
     {
-      "#": 260,
-      "Date": "2024-09-23T00:00:00",
+      "Date": "2024-09-23",
       "Caller": "Doug",
       "Calls": 5,
       "Connections": 4,
@@ -1662,7 +1564,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1670,8 +1572,7 @@
       "Comments": null
     },
     {
-      "#": 257,
-      "Date": "2024-09-19T00:00:00",
+      "Date": "2024-09-19",
       "Caller": "Doug",
       "Calls": 10,
       "Connections": 4,
@@ -1679,7 +1580,7 @@
       "SMS": 6,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1687,8 +1588,7 @@
       "Comments": null
     },
     {
-      "#": 254,
-      "Date": "2024-09-17T00:00:00",
+      "Date": "2024-09-17",
       "Caller": "Doug",
       "Calls": 3,
       "Connections": 0,
@@ -1696,7 +1596,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1704,8 +1604,7 @@
       "Comments": null
     },
     {
-      "#": 251,
-      "Date": "2024-09-13T00:00:00",
+      "Date": "2024-09-13",
       "Caller": "Doug",
       "Calls": 7,
       "Connections": 5,
@@ -1713,7 +1612,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1721,8 +1620,7 @@
       "Comments": null
     },
     {
-      "#": 250,
-      "Date": "2024-09-12T00:00:00",
+      "Date": "2024-09-12",
       "Caller": "Doug",
       "Calls": 4,
       "Connections": 4,
@@ -1730,7 +1628,7 @@
       "SMS": 5,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1738,8 +1636,7 @@
       "Comments": null
     },
     {
-      "#": 249,
-      "Date": "2024-09-11T00:00:00",
+      "Date": "2024-09-11",
       "Caller": "Doug",
       "Calls": 16,
       "Connections": 14,
@@ -1747,7 +1644,7 @@
       "SMS": 5,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1755,8 +1652,7 @@
       "Comments": null
     },
     {
-      "#": 245,
-      "Date": "2024-09-09T00:00:00",
+      "Date": "2024-09-09",
       "Caller": "Doug",
       "Calls": 6,
       "Connections": 4,
@@ -1764,7 +1660,7 @@
       "SMS": 0,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1772,8 +1668,7 @@
       "Comments": null
     },
     {
-      "#": 241,
-      "Date": "2024-09-05T00:00:00",
+      "Date": "2024-09-05",
       "Caller": "Doug",
       "Calls": 4,
       "Connections": 1,
@@ -1781,7 +1676,7 @@
       "SMS": 4,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 1,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1789,8 +1684,7 @@
       "Comments": "new management lead for Jaclyn"
     },
     {
-      "#": 236,
-      "Date": "2024-09-02T00:00:00",
+      "Date": "2024-09-02",
       "Caller": "Doug",
       "Calls": 6,
       "Connections": 4,
@@ -1798,7 +1692,7 @@
       "SMS": 1,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1806,8 +1700,7 @@
       "Comments": null
     },
     {
-      "#": 232,
-      "Date": "2024-08-29T00:00:00",
+      "Date": "2024-08-29",
       "Caller": "Doug",
       "Calls": 6,
       "Connections": 4,
@@ -1815,7 +1708,7 @@
       "SMS": 2,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 1,
       "Appointments": 0,
       "Appraisals": 1,
@@ -1823,8 +1716,7 @@
       "Comments": "The Witton: Jeremy Lloyd-Jones may be selling or renting."
     },
     {
-      "#": 226,
-      "Date": "2024-08-28T00:00:00",
+      "Date": "2024-08-28",
       "Caller": "Doug",
       "Calls": 20,
       "Connections": 13,
@@ -1832,7 +1724,7 @@
       "SMS": 7,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 1,
       "Appraisals": 0,
@@ -1840,8 +1732,7 @@
       "Comments": null
     },
     {
-      "#": 224,
-      "Date": "2024-08-27T00:00:00",
+      "Date": "2024-08-27",
       "Caller": "Doug",
       "Calls": 14,
       "Connections": 6,
@@ -1849,7 +1740,7 @@
       "SMS": 9,
       "CMA": 0,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 1,
       "Appointments": 0,
       "Appraisals": 0,
@@ -1857,8 +1748,7 @@
       "Comments": "Reasonably good calls."
     },
     {
-      "#": 217,
-      "Date": "2024-08-21T00:00:00",
+      "Date": "2024-08-21",
       "Caller": "Doug",
       "Calls": 8,
       "Connections": 2,
@@ -1866,7 +1756,7 @@
       "SMS": 6,
       "CMA": 1,
       "Form6 Sent": 0,
-      "Form6\u00a0Received": 0,
+      "Form6 Received": 0,
       "Leads": 0,
       "Appointments": 0,
       "Appraisals": 0,
