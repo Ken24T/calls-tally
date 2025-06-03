@@ -35,8 +35,15 @@ def main():
     python_major = sys.version_info.major
     python_minor = sys.version_info.minor
     python_dll_name = f"python{python_major}{python_minor}.dll"  # e.g., python312.dll
-    python_dir = os.path.dirname(sys.executable)  # Directory where python.exe is
+    # Use sys.base_prefix to get the root of the Python installation
+    # This is more reliable for finding core DLLs, especially with venvs or store Python
+    python_dir = sys.base_prefix 
     python_dll_path = os.path.join(python_dir, python_dll_name)
+
+    # If the DLL is in a 'DLLs' subdirectory of sys.base_prefix, adjust path:
+    if not os.path.exists(python_dll_path) and os.path.exists(os.path.join(python_dir, "DLLs", python_dll_name)):
+        python_dll_path = os.path.join(python_dir, "DLLs", python_dll_name)
+
 
     # Run PyInstaller using the current interpreter.
     cmd = [
