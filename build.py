@@ -36,6 +36,7 @@ def main():
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--noconsole",
+        "--onedir",  # Explicitly use one-folder mode
         "--name", "CallsTally",
         "--add-data", r"styles.qss;.",     # Include stylesheet in the root
         "--add-data", r"data\*.json;data",

@@ -4,7 +4,7 @@
 a = Analysis(
     ['app.py'],
     pathex=[],
-    binaries=[('C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\\python312.dll', '.')],
+    binaries=[],
     datas=[('styles.qss', '.'), ('data\\*.json', 'data')],
     hiddenimports=[],
     hookspath=[],
