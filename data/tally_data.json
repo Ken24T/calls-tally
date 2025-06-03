@@ -1,9 +1,6 @@
 {
   "users": [
-    "Ken",
-    "Jaclyn",
-    "John",
-    "Wendy"
+    "Ken"
   ],
   "entries": [
     {
@@ -21,38 +18,6 @@
       "cma": 2,
       "appraisals": 2,
       "tasks": 2
-    },
-    {
-      "user": "Jaclyn",
-      "date": "2025-03-26",
-      "comments": "",
-      "calls": 0,
-      "connections": 0,
-      "email": 0,
-      "sms": 0,
-      "form6_sent": 0,
-      "form6_received": 0,
-      "leads": 0,
-      "appointments": 0,
-      "cma": 0,
-      "appraisals": 0,
-      "tasks": 0
-    },
-    {
-      "user": "Jaclyn",
-      "date": "2025-03-27",
-      "comments": "",
-      "calls": 10,
-      "connections": 4,
-      "email": 2,
-      "sms": 2,
-      "form6_sent": 0,
-      "form6_received": 0,
-      "leads": 0,
-      "appointments": 0,
-      "cma": 0,
-      "appraisals": 0,
-      "tasks": 0
     },
     {
       "user": "Ken",
@@ -133,6 +98,22 @@
       "cma": 0,
       "appraisals": 0,
       "tasks": 0
+    },
+    {
+      "user": "Ken",
+      "date": "2025-06-04",
+      "comments": "This is how a comment looks in this layout",
+      "calls": 998,
+      "conns": 7,
+      "email": 0,
+      "sms": 0,
+      "f6_sent": 0,
+      "f6_rec'd": 0,
+      "leads": 1,
+      "appts": 1,
+      "cma": 1,
+      "apprs": 1,
+      "tasks": 1
     }
   ]
 }

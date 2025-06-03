@@ -27,7 +27,7 @@ class DataManager:
         try:
             with open(self.file_path, 'w') as f:
                 json.dump(data, f, indent=2)
-            print("Data saved successfully to", self.file_path)
+            # print("Data saved successfully to", self.file_path)
         except Exception as e:
             print("Error saving data:", e)
     
