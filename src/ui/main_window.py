@@ -132,33 +132,35 @@ class MainWindow(QMainWindow):
         tab_widget.setMinimumHeight(440)
         tab_widget.setMaximumHeight(440)
         tab_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-
+        # --- Helper for section creation ---
+        def add_section(layout, section_label, sources, suffix):
+            layout.addRow(QLabel(f"<b>{section_label}</b>"))
+            counters = {}
+            for source in sources:
+                field_name = f"{source.lower()}_{suffix}"
+                label = source.replace("courses.com.au", "Courses.com.au").replace("c-fox", "C-FOX").capitalize() + f" {section_label}"
+                counter_layout = QHBoxLayout()
+                spin_box = QSpinBox()
+                spin_box.setMinimum(0)
+                spin_box.setMaximum(999)
+                spin_box.setMinimumHeight(31)
+                spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+                spin_box.setFixedWidth(70)
+                spin_box.valueChanged.connect(self.mark_dirty)
+                spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
+                counter_layout.addWidget(spin_box)
+                layout.addRow(label, counter_layout)
+                counters[field_name] = spin_box
+            return counters
+        sources = ["google", "c-fox", "courses.com.au", "organic", "agents"]
         # --- Current Leads Tab ---
         current_leads_widget = QWidget()
         current_leads_layout = QFormLayout(current_leads_widget)
         current_leads_layout.setSpacing(10)
         current_leads_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
         self.counters = {}
-        counter_names = [
-            "Calls", "Conns", "Email", "SMS", "F6 Sent", 
-            "F6 Rec'd", "Leads", "Appts", "CMA", 
-            "Apprs", "Tasks"
-        ]
-        for name in counter_names:
-            field_name = name.lower().replace(" ", "_")
-            counter_layout = QHBoxLayout()
-            spin_box = QSpinBox()
-            spin_box.setMinimum(0)
-            spin_box.setMaximum(999)
-            spin_box.setMinimumHeight(31)  # Increased minimum height for better visibility
-            spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)  # Prevent shrinking below minimum height
-            spin_box.setFixedWidth(70)  # <-- Manually set the width in pixels (adjust as needed)
-            # Connect mark_dirty before autosave
-            spin_box.valueChanged.connect(self.mark_dirty)
-            spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
-            counter_layout.addWidget(spin_box)
-            current_leads_layout.addRow(name, counter_layout)
-            self.counters[field_name] = spin_box
+        self.counters.update(add_section(current_leads_layout, "Connects", sources, "connects"))
+        self.counters.update(add_section(current_leads_layout, "Non-Connects", sources, "nonconnects"))
         tab_widget.addTab(current_leads_widget, "Current Leads")
 
         # --- Prospects Tab ---
@@ -167,21 +169,8 @@ class MainWindow(QMainWindow):
         prospects_layout.setSpacing(10)
         prospects_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
         self.prospects_counters = {}
-        for name in counter_names:
-            field_name = name.lower().replace(" ", "_")
-            counter_layout = QHBoxLayout()
-            spin_box = QSpinBox()
-            spin_box.setMinimum(0)
-            spin_box.setMaximum(999)
-            spin_box.setMinimumHeight(31)  # Increased minimum height for better visibility
-            spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)  # Prevent shrinking below minimum height
-            spin_box.setFixedWidth(70)  # <-- Manually set the width in pixels (adjust as needed)
-            # Connect mark_dirty before autosave
-            spin_box.valueChanged.connect(self.mark_dirty)
-            spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
-            counter_layout.addWidget(spin_box)
-            prospects_layout.addRow(name, counter_layout)
-            self.prospects_counters[field_name] = spin_box
+        self.prospects_counters.update(add_section(prospects_layout, "Connects", sources, "connects"))
+        self.prospects_counters.update(add_section(prospects_layout, "Non-Connects", sources, "nonconnects"))
         tab_widget.addTab(prospects_widget, "Prospects")
 
         self.main_layout.addWidget(tab_widget)

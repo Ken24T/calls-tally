@@ -1766,7 +1766,7 @@
     {
       "user": "Ken",
       "date": "2025-06-17",
-      "comments": "",
+      "comments": "New Layout testing....",
       "calls": 1,
       "conns": 0,
       "email": 2,
@@ -1779,30 +1779,28 @@
       "apprs": 0,
       "tasks": 0,
       "current_leads": {
-        "calls": 7,
-        "conns": 6,
-        "email": 5,
-        "sms": 0,
-        "f6_sent": 0,
-        "f6_rec'd": 0,
-        "leads": 0,
-        "appts": 0,
-        "cma": 0,
-        "apprs": 0,
-        "tasks": 0
+        "google_connects": 1,
+        "c-fox_connects": 2,
+        "courses.com.au_connects": 3,
+        "organic_connects": 4,
+        "agents_connects": 5,
+        "google_nonconnects": 6,
+        "c-fox_nonconnects": 7,
+        "courses.com.au_nonconnects": 8,
+        "organic_nonconnects": 9,
+        "agents_nonconnects": 10
       },
       "prospects": {
-        "calls": 5,
-        "conns": 6,
-        "email": 7,
-        "sms": 0,
-        "f6_sent": 0,
-        "f6_rec'd": 0,
-        "leads": 0,
-        "appts": 0,
-        "cma": 0,
-        "apprs": 0,
-        "tasks": 0
+        "google_connects": 11,
+        "c-fox_connects": 12,
+        "courses.com.au_connects": 13,
+        "organic_connects": 14,
+        "agents_connects": 15,
+        "google_nonconnects": 16,
+        "c-fox_nonconnects": 17,
+        "courses.com.au_nonconnects": 18,
+        "organic_nonconnects": 19,
+        "agents_nonconnects": 20
       }
     }
   ]
