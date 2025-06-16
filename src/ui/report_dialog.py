@@ -119,7 +119,7 @@ class ReportDialog(QDialog):
         
         # Generate the plain text report
         report_lines = []
-        report_lines.append("Call Tally Report")
+        report_lines.append("Call Tracker Report")
         report_lines.append(f"Period: {start_date_str} to {end_date_str}")
         report_lines.append("\nOverall Totals:")
         for key, value in overall_totals.items():
@@ -156,7 +156,7 @@ class ReportDialog(QDialog):
             to_email = self.email_to.text().strip()
             start_date_str = self.start_date.date().toString("yyyy-MM-dd")
             end_date_str = self.end_date.date().toString("yyyy-MM-dd")
-            subject = f"Call Tally Report {start_date_str} to {end_date_str}"
+            subject = f"Call Tracker Report {start_date_str} to {end_date_str}"
 
             mailto_parts = []
             if to_email:

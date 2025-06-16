@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
         self.data_manager = DataManager('data/tally_data.json')
         
         # Set up the main window
-        self.setWindowTitle("Calls Tally App")
+        self.setWindowTitle("Call Tracker App")
         self.setFixedSize(300, 900)  # Fixed window size to prevent resizing across monitors
         
         # Apply window position if remember setting is enabled
