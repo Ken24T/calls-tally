@@ -25,10 +25,25 @@ If you have an old tally data file (usually named `tally_data.json`):
    - If asked to replace the existing file, choose **Replace** or **Yes**.
 6. When you next open the app, your previous tally data will be available.
 
-## 4. Notes
-- Do **not** move or rename files inside the app folder unless instructed.
-- Always keep a backup of your tally data if it is important to you.
-- If you have any issues, contact your support person for help.
+---
+
+## 4. First-Time Setup: Adding a User and Setting the Default Email Recipient
+
+After starting the Call Tracker App for the first time:
+
+1. **Add a User**
+   - Go to the **Users** menu (accessible from the menu bar).
+   - Find the option labeled **Add User**.
+   - Click **Add User**.
+   - Enter your name, then save.
+
+2. **Set the Default Email Recipient for Reports**
+   - In the **Settings** menu, locate the tab for **Email**.
+   - Find the field labeled **Default Recipients**.
+   - Enter the email address where you want reports to be sent by default. You can add multiple by separating them with ';'.
+   - Save your changes.
+
+You can now use the app to track calls and send reports to your chosen email address.
 
 ---
 
