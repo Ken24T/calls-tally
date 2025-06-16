@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QLabel,
 from PyQt6.QtCore import QDate
 import webbrowser
 import urllib.parse # Re-add for mailto URL encoding
+import datetime  # Added for weekday name
 
 class ReportDialog(QDialog):
     def __init__(self, data_manager):
@@ -133,8 +134,16 @@ class ReportDialog(QDialog):
         
         report_lines.append("\nDaily Breakdown:")
         sorted_dates = sorted(date_totals.keys())
-        for date_key in sorted_dates:
-            report_lines.append(f"  {date_key}:")
+        for i, date_key in enumerate(sorted_dates):
+            if i > 0:
+                report_lines.append("")  # Add a blank line before each date except the first
+            # Parse date_key and get weekday name
+            try:
+                dt = datetime.datetime.strptime(date_key, "%Y-%m-%d")
+                weekday_name = dt.strftime("%A")
+            except Exception:
+                weekday_name = ""
+            report_lines.append(f"  {date_key}: ({weekday_name})")
             totals = date_totals[date_key]
             for key, value in totals.items():
                 report_lines.append(f"    {key.replace('_', ' ').title()}: {value}")
