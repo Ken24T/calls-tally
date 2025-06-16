@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
     QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QFormLayout, QSpinBox, QGroupBox, 
-    QInputDialog, QSizePolicy, QApplication)
+    QInputDialog, QSizePolicy, QApplication, QSpacerItem)
 from PyQt6.QtGui import QAction, QTextCharFormat, QFont  # added QTextCharFormat, QFont
 from PyQt6.QtCore import QDate
 from src.ui.report_dialog import ReportDialog
@@ -41,11 +41,11 @@ class MainWindow(QMainWindow):
         self.create_form()
         
         # Add save button at the bottom
-        self.save_button = QPushButton("Save")
-        self.save_button.clicked.connect(self.save_data)
-        self.save_button.setObjectName("primary-button")
-        self.save_button.setEnabled(False)  # Initially disabled
-        self.main_layout.addWidget(self.save_button)
+        # self.save_button = QPushButton("Save")
+        # self.save_button.clicked.connect(self.save_data)
+        # self.save_button.setObjectName("primary-button")
+        # self.save_button.setEnabled(False)  # Initially disabled
+        # self.main_layout.addWidget(self.save_button)
 
         # Add done button below save button
         self.done_button = QPushButton("Done")
@@ -58,8 +58,7 @@ class MainWindow(QMainWindow):
         
         # Update user dropdown and clear current selection
         self.update_user_dropdown()
-        self.user_combo.setCurrentIndex(-1)
-        
+
         self.user_combo.currentIndexChanged.connect(self.load_user_entry)
         self.user_combo.currentIndexChanged.connect(self.update_save_button_state)  # Enable/disable Save
         self.date_edit.dateChanged.connect(self.load_user_entry)
@@ -105,11 +104,11 @@ class MainWindow(QMainWindow):
         user_layout.addWidget(self.user_combo)
         
         # Add '+' button to the right of the user_combo
-        self.add_user_button = QPushButton("+")
-        self.add_user_button.setFixedWidth(40)
-        self.add_user_button.setToolTip("Add new user")
-        self.add_user_button.clicked.connect(self.add_user)
-        user_layout.addWidget(self.add_user_button)
+        # self.add_user_button = QPushButton("+")
+        # self.add_user_button.setFixedWidth(40)
+        # self.add_user_button.setToolTip("Add new user")
+        # self.add_user_button.clicked.connect(self.add_user)
+        # user_layout.addWidget(self.add_user_button)
         
         # Date selection
         date_layout = QHBoxLayout()
@@ -141,9 +140,9 @@ class MainWindow(QMainWindow):
         # Create counters with a helper function
         self.counters = {}
         counter_names = [
-            "Calls", "Connections", "Email", "SMS", "Form6 Sent", 
-            "Form6 Received", "Leads", "Appointments", "CMA", 
-            "Appraisals", "Tasks"
+            "Calls", "Conns", "Email", "SMS", "F6 Sent", 
+            "F6 Rec'd", "Leads", "Appts", "CMA", 
+            "Apprs", "Tasks"
         ]
         
         for name in counter_names:
@@ -152,40 +151,84 @@ class MainWindow(QMainWindow):
             spin_box = QSpinBox()
             spin_box.setMinimum(0)
             spin_box.setMaximum(999)
-            spin_box.setMinimumHeight(32)  # Increased minimum height for better visibility
+            spin_box.setMinimumHeight(31)  # Increased minimum height for better visibility
             spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)  # Prevent shrinking below minimum height
-            spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
+            spin_box.setFixedWidth(70)  # <-- Manually set the width in pixels (adjust as needed)
+            # Connect mark_dirty before autosave
             spin_box.valueChanged.connect(self.mark_dirty)
+            spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
             counter_layout.addWidget(spin_box)
             counters_layout.addRow(name, counter_layout)
             self.counters[field_name] = spin_box
         
         self.main_layout.addWidget(counters_group)
-        
+        # Remove the addStretch() call from here if it exists.
+        # For example, if there was a line like self.main_layout.addStretch() here, it should be removed.
+
+        # Modify existing spacer to be expanding, or ensure it is if previously changed.
+        # The key change is QSizePolicy.Policy.Expanding for the vertical policy.
+        self.main_layout.addSpacerItem(QSpacerItem(0, 32, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
+
         # Comments field
-        self.main_layout.addWidget(QLabel("Comments:"))
+        comments_label = QLabel("Comments:")
+        comments_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        # self.main_layout.addWidget(comments_label) # Commented out to hide the label
         self.comments_edit = QTextEdit()
-        # Remove fixed height and allow expansion using the correct QSizePolicy enum
-        self.comments_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        # NEW: Autosave on every change in comments
-        self.comments_edit.textChanged.connect(self.autosave)
+        self.comments_edit.setFixedHeight(60)
+        self.comments_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        # Connect mark_dirty before autosave
         self.comments_edit.textChanged.connect(self.mark_dirty)
+        self.comments_edit.textChanged.connect(self.autosave)
         self.main_layout.addWidget(self.comments_edit)
-        
-        # Add stretch so extra space is used dynamically
-        self.main_layout.addStretch()
+
+        # Ensure no other addStretch() is at the very end of this method if it interferes.
+        # If an addStretch() was at the end of create_form() to push buttons down,
+        # it might need to be re-evaluated or removed if the expanding spacer handles all slack.
+        # Given the buttons are added after create_form in __init__, this might not be an issue here.
     
     def update_user_dropdown(self):
-        # Get users and update combo box with no default selection
+        # Get users and update combo box
         self.user_combo.blockSignals(True)
+        current_selection_text = self.user_combo.currentText() # Store current selection text
         self.user_combo.clear()
         users = self.data_manager.get_users()
+        
+        user_was_selected_programmatically = False
+
         if users:
             self.user_combo.addItems(users)
-            self.user_combo.setCurrentIndex(-1)  # No selection
+            if len(users) == 1:
+                self.user_combo.setCurrentIndex(0)  # Select the single user
+                user_was_selected_programmatically = True
+            elif current_selection_text and current_selection_text in users:
+                self.user_combo.setCurrentText(current_selection_text) # Restore previous selection
+                # If a user was re-selected, their data should ideally be loaded or re-loaded.
+                # However, load_user_entry is already connected to currentIndexChanged.
+                # For initial startup, the explicit call is key.
+                # For subsequent calls (e.g. after adding a user), if the selection changes, the signal will handle it.
+                # If selection doesn't change but list does, an explicit load might be desired if context changes.
+                # For now, focus on initial load for single user.
+                if self.user_combo.currentIndex() >= 0: # Check if a user is actually selected
+                    user_was_selected_programmatically = True
+
+            else:
+                self.user_combo.setCurrentIndex(-1)  # No selection
         else:
             self.user_combo.setCurrentIndex(-1)
+        
         self.user_combo.blockSignals(False)
+        
+        # If a user was set (either the single one or a restored one)
+        # and this is likely the initial setup (or a scenario where an explicit load is beneficial),
+        # call load_user_entry.
+        # The currentIndexChanged signal might not fire if setCurrentIndex is called while signals are blocked,
+        # or if the index doesn't actually change from its previous state before clear().
+        if user_was_selected_programmatically and self.user_combo.currentIndex() >= 0:
+            # Check if this is the first time update_user_dropdown is called (during __init__)
+            # A more robust way might be to pass a flag or check a state if this method is called multiple times
+            # For now, assume if a user is selected programmatically here, we should load their data.
+            self.load_user_entry()
+
         self.update_save_button_state()
     
     def update_save_button_state(self):
@@ -193,7 +236,7 @@ class MainWindow(QMainWindow):
         idx = self.user_combo.currentIndex()
         txt = self.user_combo.currentText()
         enabled = idx >= 0 and bool(txt.strip())
-        self.save_button.setEnabled(enabled)
+        # self.save_button.setEnabled(enabled) # Also comment out references to save_button
         if hasattr(self, 'generate_report_action'):
             self.generate_report_action.setEnabled(enabled)
 
@@ -229,6 +272,7 @@ class MainWindow(QMainWindow):
             **counter_data
         }
         self.data_manager.save_entry(entry_data)
+        # Any "Data saved successfully" dialog that might have been here is removed.
         # Removed QApplication.beep() to eliminate sound
         self.dirty = False
     

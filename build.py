@@ -31,16 +31,18 @@ def main():
     if not check_git_clean():
         sys.exit(1)
     clean_previous_builds()
+
     # Run PyInstaller using the current interpreter.
-    # Added "--add-data" for styles.qss so that it is included alongside the executable.
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--noconsole",
         "--name", "call-tracker",
         "--add-data", r"styles.qss;.",     # Include stylesheet in the root
         "--add-data", r"data\*.json;data",
-        "app.py"
     ]
+
+    cmd.append("app.py")
+
     result = subprocess.run(cmd)
     if result.returncode != 0:
         print("Build failed.")
