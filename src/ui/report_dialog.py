@@ -84,6 +84,9 @@ class ReportDialog(QDialog):
         start_date_str = self.start_date.date().toString("yyyy-MM-dd")
         end_date_str = self.end_date.date().toString("yyyy-MM-dd")
         data = self.data_manager.get_data_for_date_range(start_date_str, end_date_str)
+        user_name = None
+        if data:
+            user_name = data[0].get("user", None)
         if not data:
             self.report_display.setText("No data found for the selected date range.")
             self.send_btn.setEnabled(False)
@@ -109,7 +112,10 @@ class ReportDialog(QDialog):
                         result[stype][src] += value
             return result
         report_lines = []
-        report_lines.append("Call Tracker Report")
+        if user_name:
+            report_lines.append(f"Call Tracker Report for {user_name}")
+        else:
+            report_lines.append("Call Tracker Report")
         report_lines.append(f"Period: {start_date_str} to {end_date_str}")
         for tab_label, section_key in [("Current Leads", "current_leads"), ("Prospects", "prospects")]:
             report_lines.append(f"\n=== {tab_label} ===")

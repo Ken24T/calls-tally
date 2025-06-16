@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         
         # Set up the main window
         self.setWindowTitle("Call Tracker App")
-        self.setFixedSize(300, 900)  # Fixed window size to prevent resizing across monitors
+        self.setFixedSize(300, 800)  # Reduced from 900 to 800 to fit new layout
         
         # Apply window position if remember setting is enabled
         self.apply_window_position()
@@ -179,14 +179,14 @@ class MainWindow(QMainWindow):
 
         # Modify existing spacer to be expanding, or ensure it is if previously changed.
         # The key change is QSizePolicy.Policy.Expanding for the vertical policy.
-        self.main_layout.addSpacerItem(QSpacerItem(0, 32, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
+        # self.main_layout.addSpacerItem(QSpacerItem(0, 32, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
         # Comments field
         comments_label = QLabel("Comments:")
         comments_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         # self.main_layout.addWidget(comments_label) # Commented out to hide the label
         self.comments_edit = QTextEdit()
-        self.comments_edit.setFixedHeight(60)
+        self.comments_edit.setFixedHeight(120)  # Double the previous height (was 60)
         self.comments_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         # Connect mark_dirty before autosave
         self.comments_edit.textChanged.connect(self.mark_dirty)
