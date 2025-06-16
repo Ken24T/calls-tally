@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
     QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QFormLayout, QSpinBox, QGroupBox, 
-    QInputDialog, QSizePolicy, QApplication, QSpacerItem)
+    QInputDialog, QSizePolicy, QApplication, QSpacerItem, QTabWidget)  # Added QTabWidget
 from PyQt6.QtGui import QAction, QTextCharFormat, QFont  # added QTextCharFormat, QFont
 from PyQt6.QtCore import QDate
 from src.ui.report_dialog import ReportDialog
@@ -127,24 +127,23 @@ class MainWindow(QMainWindow):
         # Store the currently loaded date as ISO string.
         self.current_date_str = self.date_edit.date().toString("yyyy-MM-dd")
         
-        # Counters group
-        counters_group = QGroupBox("Call Tallies")
-        counters_group.setMinimumHeight(440)  # Adjusted to fit all controls at standard dimensions
-        counters_group.setMaximumHeight(440)  # Prevent growing beyond intended size
-        counters_group.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        counters_layout = QFormLayout(counters_group)
-        counters_layout.setSpacing(10)
-        # Allow fields in the form to expand horizontally
-        counters_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
-        
-        # Create counters with a helper function
+        # Counters tab widget
+        tab_widget = QTabWidget()
+        tab_widget.setMinimumHeight(440)
+        tab_widget.setMaximumHeight(440)
+        tab_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+
+        # --- Current Leads Tab ---
+        current_leads_widget = QWidget()
+        current_leads_layout = QFormLayout(current_leads_widget)
+        current_leads_layout.setSpacing(10)
+        current_leads_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
         self.counters = {}
         counter_names = [
             "Calls", "Conns", "Email", "SMS", "F6 Sent", 
             "F6 Rec'd", "Leads", "Appts", "CMA", 
             "Apprs", "Tasks"
         ]
-        
         for name in counter_names:
             field_name = name.lower().replace(" ", "_")
             counter_layout = QHBoxLayout()
@@ -158,10 +157,34 @@ class MainWindow(QMainWindow):
             spin_box.valueChanged.connect(self.mark_dirty)
             spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
             counter_layout.addWidget(spin_box)
-            counters_layout.addRow(name, counter_layout)
+            current_leads_layout.addRow(name, counter_layout)
             self.counters[field_name] = spin_box
-        
-        self.main_layout.addWidget(counters_group)
+        tab_widget.addTab(current_leads_widget, "Current Leads")
+
+        # --- Prospects Tab ---
+        prospects_widget = QWidget()
+        prospects_layout = QFormLayout(prospects_widget)
+        prospects_layout.setSpacing(10)
+        prospects_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        self.prospects_counters = {}
+        for name in counter_names:
+            field_name = name.lower().replace(" ", "_")
+            counter_layout = QHBoxLayout()
+            spin_box = QSpinBox()
+            spin_box.setMinimum(0)
+            spin_box.setMaximum(999)
+            spin_box.setMinimumHeight(31)  # Increased minimum height for better visibility
+            spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)  # Prevent shrinking below minimum height
+            spin_box.setFixedWidth(70)  # <-- Manually set the width in pixels (adjust as needed)
+            # Connect mark_dirty before autosave
+            spin_box.valueChanged.connect(self.mark_dirty)
+            spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
+            counter_layout.addWidget(spin_box)
+            prospects_layout.addRow(name, counter_layout)
+            self.prospects_counters[field_name] = spin_box
+        tab_widget.addTab(prospects_widget, "Prospects")
+
+        self.main_layout.addWidget(tab_widget)
         # Remove the addStretch() call from here if it exists.
         # For example, if there was a line like self.main_layout.addStretch() here, it should be removed.
 
@@ -262,20 +285,18 @@ class MainWindow(QMainWindow):
             date_str = date_str_override
         else:
             date_str = self.date_edit.date().toString("yyyy-MM-dd")
-        counter_data = {}
-        for field_name, spin_box in self.counters.items():
-            counter_data[field_name] = spin_box.value()
+        current_leads_data = {field_name: spin_box.value() for field_name, spin_box in self.counters.items()}
+        prospects_data = {field_name: spin_box.value() for field_name, spin_box in self.prospects_counters.items()}
         entry_data = {
             "user": self.user_combo.currentText(),
             "date": date_str,
             "comments": self.comments_edit.toPlainText(),
-            **counter_data
+            "current_leads": current_leads_data,
+            "prospects": prospects_data
         }
         self.data_manager.save_entry(entry_data)
-        # Any "Data saved successfully" dialog that might have been here is removed.
-        # Removed QApplication.beep() to eliminate sound
         self.dirty = False
-    
+
     def load_user_entry(self):
         """Load existing call statistics for the selected user and date into the UI."""
         self.current_date_str = self.date_edit.date().toString("yyyy-MM-dd")
@@ -284,25 +305,38 @@ class MainWindow(QMainWindow):
             return
         date_str = self.date_edit.date().toString("yyyy-MM-dd")
         entry = self.data_manager.get_entry_for_user_and_date(user, date_str)
-        
         # Block signals so programmatic updates don’t trigger autosave.
         self.comments_edit.blockSignals(True)
         for spin_box in self.counters.values():
             spin_box.blockSignals(True)
-        
+        for spin_box in self.prospects_counters.values():
+            spin_box.blockSignals(True)
         if entry:
-            for key, spin_box in self.counters.items():
-                spin_box.setValue(entry.get(key, 0))
+            # Backward compatibility: if old format, fill current_leads from flat keys
+            if "current_leads" in entry:
+                for key, spin_box in self.counters.items():
+                    spin_box.setValue(entry["current_leads"].get(key, 0))
+            else:
+                for key, spin_box in self.counters.items():
+                    spin_box.setValue(entry.get(key, 0))
+            if "prospects" in entry:
+                for key, spin_box in self.prospects_counters.items():
+                    spin_box.setValue(entry["prospects"].get(key, 0))
+            else:
+                for spin_box in self.prospects_counters.values():
+                    spin_box.setValue(0)
             self.comments_edit.setText(entry.get("comments", ""))
         else:
             for spin_box in self.counters.values():
                 spin_box.setValue(0)
+            for spin_box in self.prospects_counters.values():
+                spin_box.setValue(0)
             self.comments_edit.clear()
-        
         for spin_box in self.counters.values():
             spin_box.blockSignals(False)
+        for spin_box in self.prospects_counters.values():
+            spin_box.blockSignals(False)
         self.comments_edit.blockSignals(False)
-        
         self.update_calendar_styles()
         self.dirty = False
     

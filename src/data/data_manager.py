@@ -47,16 +47,13 @@ class DataManager:
         """Save a new entry, overwriting existing stats if an entry exists for the same date and user"""
         data = self._load_data()
         
-        # Check if there's an existing entry for the same date and user
         found = False
         for existing_entry in data["entries"]:
             if (existing_entry["user"] == entry["user"] and 
                 existing_entry["date"] == entry["date"]):
-                # Overwrite all counters instead of adding to them
-                for key, value in entry.items():
-                    if key not in ["user", "date", "comments"]:
-                        existing_entry[key] = value
-                # Overwrite comments entirely
+                # Overwrite all counters for both current_leads and prospects
+                existing_entry["current_leads"] = entry.get("current_leads", {})
+                existing_entry["prospects"] = entry.get("prospects", {})
                 existing_entry["comments"] = entry["comments"]
                 found = True
                 break

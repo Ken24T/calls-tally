@@ -83,75 +83,70 @@ class ReportDialog(QDialog):
     def generate_report(self):
         start_date_str = self.start_date.date().toString("yyyy-MM-dd")
         end_date_str = self.end_date.date().toString("yyyy-MM-dd")
-        
         data = self.data_manager.get_data_for_date_range(start_date_str, end_date_str)
-        
         if not data:
             self.report_display.setText("No data found for the selected date range.")
             self.send_btn.setEnabled(False)
             return
-        
-        user_totals = {}
-        date_totals = {}
-        overall_totals = {
-            "calls": 0, "connections": 0, "email": 0, "sms": 0,
-            "form6_sent": 0, "form6_received": 0, "leads": 0,
-            "appointments": 0, "cma": 0, "appraisals": 0, "tasks": 0
-        }
-        
-        for entry in data:
-            user = entry["user"]
-            date_val = entry["date"]
-            
-            if user not in user_totals:
-                user_totals[user] = {k: 0 for k in overall_totals.keys()}
-            if date_val not in date_totals:
-                date_totals[date_val] = {k: 0 for k in overall_totals.keys()}
-            
-            for key in overall_totals.keys():
-                if key in entry:
+        # Helper to aggregate a section
+        def aggregate_section(data, section_key, counter_keys):
+            user_totals = {}
+            date_totals = {}
+            overall_totals = {k: 0 for k in counter_keys}
+            for entry in data:
+                user = entry["user"]
+                date_val = entry["date"]
+                section = entry.get(section_key, {})
+                # Backward compatibility: if section missing, use flat keys for current_leads
+                if not section and section_key == "current_leads":
+                    section = {k: entry.get(k, 0) for k in counter_keys}
+                if user not in user_totals:
+                    user_totals[user] = {k: 0 for k in counter_keys}
+                if date_val not in date_totals:
+                    date_totals[date_val] = {k: 0 for k in counter_keys}
+                for key in counter_keys:
                     try:
-                        value = int(entry.get(key, 0))
+                        value = int(section.get(key, 0))
                     except (ValueError, TypeError):
                         value = 0
                     user_totals[user][key] += value
                     date_totals[date_val][key] += value
                     overall_totals[key] += value
-        
-        # Generate the plain text report
+            return user_totals, date_totals, overall_totals
+        counter_keys = [
+            "calls", "conns", "email", "sms", "f6_sent", "f6_rec'd", "leads", "appts", "cma", "apprs", "tasks"
+        ]
         report_lines = []
         report_lines.append("Call Tracker Report")
         report_lines.append(f"Period: {start_date_str} to {end_date_str}")
-        report_lines.append("\nOverall Totals:")
-        for key, value in overall_totals.items():
-            report_lines.append(f"  {key.replace('_', ' ').title()}: {value}")
-        
-        report_lines.append("\nUser Breakdown:")
-        for user, totals in user_totals.items():
-            report_lines.append(f"  {user}:")
-            for key, value in totals.items():
-                report_lines.append(f"    {key.replace('_', ' ').title()}: {value}")
-        
-        report_lines.append("\nDaily Breakdown:")
-        sorted_dates = sorted(date_totals.keys())
-        for i, date_key in enumerate(sorted_dates):
-            if i > 0:
-                report_lines.append("")  # Add a blank line before each date except the first
-            # Parse date_key and get weekday name
-            try:
-                dt = datetime.datetime.strptime(date_key, "%Y-%m-%d")
-                weekday_name = dt.strftime("%A")
-            except Exception:
-                weekday_name = ""
-            report_lines.append(f"  {date_key}: ({weekday_name})")
-            totals = date_totals[date_key]
-            for key, value in totals.items():
-                report_lines.append(f"    {key.replace('_', ' ').title()}: {value}")
-        
+        for section_label, section_key in [("Current Leads", "current_leads"), ("Prospects", "prospects")]:
+            report_lines.append(f"\n=== {section_label} ===")
+            user_totals, date_totals, overall_totals = aggregate_section(data, section_key, counter_keys)
+            report_lines.append("\nOverall Totals:")
+            for key, value in overall_totals.items():
+                report_lines.append(f"  {key.replace('_', ' ').title()}: {value}")
+            report_lines.append("\nUser Breakdown:")
+            for user, totals in user_totals.items():
+                report_lines.append(f"  {user}:")
+                for key, value in totals.items():
+                    report_lines.append(f"    {key.replace('_', ' ').title()}: {value}")
+            report_lines.append("\nDaily Breakdown:")
+            sorted_dates = sorted(date_totals.keys())
+            for i, date_key in enumerate(sorted_dates):
+                if i > 0:
+                    report_lines.append("")
+                try:
+                    dt = datetime.datetime.strptime(date_key, "%Y-%m-%d")
+                    weekday_name = dt.strftime("%A")
+                except Exception:
+                    weekday_name = ""
+                report_lines.append(f"  {date_key}: ({weekday_name})")
+                totals = date_totals[date_key]
+                for key, value in totals.items():
+                    report_lines.append(f"    {key.replace('_', ' ').title()}: {value}")
         report_text = "\n".join(report_lines)
-        
-        self.report_display.setText(report_text) # Use setText for plain text
-        self.current_generated_text = report_text # Store for sending
+        self.report_display.setText(report_text)
+        self.current_generated_text = report_text
         self.send_btn.setEnabled(True)
 
     def send_report(self):

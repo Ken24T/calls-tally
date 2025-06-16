@@ -1762,6 +1762,48 @@
       "appraisals": 0,
       "tasks": 0,
       "comments": "Morning Session"
+    },
+    {
+      "user": "Ken",
+      "date": "2025-06-17",
+      "comments": "",
+      "calls": 1,
+      "conns": 0,
+      "email": 2,
+      "sms": 0,
+      "f6_sent": 0,
+      "f6_rec'd": 0,
+      "leads": 0,
+      "appts": 0,
+      "cma": 0,
+      "apprs": 0,
+      "tasks": 0,
+      "current_leads": {
+        "calls": 7,
+        "conns": 6,
+        "email": 5,
+        "sms": 0,
+        "f6_sent": 0,
+        "f6_rec'd": 0,
+        "leads": 0,
+        "appts": 0,
+        "cma": 0,
+        "apprs": 0,
+        "tasks": 0
+      },
+      "prospects": {
+        "calls": 5,
+        "conns": 6,
+        "email": 7,
+        "sms": 0,
+        "f6_sent": 0,
+        "f6_rec'd": 0,
+        "leads": 0,
+        "appts": 0,
+        "cma": 0,
+        "apprs": 0,
+        "tasks": 0
+      }
     }
   ]
 }
