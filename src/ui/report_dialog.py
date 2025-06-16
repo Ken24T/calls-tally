@@ -4,7 +4,6 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QLabel,
 from PyQt6.QtCore import QDate
 import webbrowser
 import urllib.parse # Re-add for mailto URL encoding
-import datetime  # Added for weekday name
 
 class ReportDialog(QDialog):
     def __init__(self, data_manager):

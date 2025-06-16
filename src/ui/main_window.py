@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-    QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QFormLayout, QSpinBox, QGroupBox, 
-    QInputDialog, QSizePolicy, QApplication, QSpacerItem, QTabWidget)  # Added QTabWidget
+    QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QFormLayout, QSpinBox, QInputDialog, QSizePolicy, QApplication, QTabWidget, QMenuBar)  # Added QTabWidget, QMenuBar
 from PyQt6.QtGui import QAction, QTextCharFormat, QFont  # added QTextCharFormat, QFont
 from PyQt6.QtCore import QDate
 from src.ui.report_dialog import ReportDialog
@@ -67,24 +66,30 @@ class MainWindow(QMainWindow):
     def create_menus(self):
         # Create menu bar
         menu_bar = self.menuBar()
+        if not isinstance(menu_bar, QMenuBar):
+            menu_bar = QMenuBar(self)
+            self.setMenuBar(menu_bar)
         # Users menu
         users_menu = menu_bar.addMenu("Users")
-        add_user_action = QAction("Add User", self)
-        add_user_action.triggered.connect(self.add_user)
-        users_menu.addAction(add_user_action)
+        if users_menu is not None:
+            add_user_action = QAction("Add User", self)
+            add_user_action.triggered.connect(self.add_user)
+            users_menu.addAction(add_user_action)
         
         # Edit menu
         edit_menu = menu_bar.addMenu("Edit")
-        settings_action = QAction("Settings", self)
-        settings_action.triggered.connect(self.show_settings_dialog)
-        edit_menu.addAction(settings_action)
+        if edit_menu is not None:
+            settings_action = QAction("Settings", self)
+            settings_action.triggered.connect(self.show_settings_dialog)
+            edit_menu.addAction(settings_action)
         
         # Reports menu
         reports_menu = menu_bar.addMenu("Reports")
-        self.generate_report_action = QAction("Generate Report", self)
-        self.generate_report_action.triggered.connect(self.show_report_dialog)
-        reports_menu.addAction(self.generate_report_action)
-        self.generate_report_action.setEnabled(False)
+        if reports_menu is not None:
+            self.generate_report_action = QAction("Generate Report", self)
+            self.generate_report_action.triggered.connect(self.show_report_dialog)
+            reports_menu.addAction(self.generate_report_action)
+            self.generate_report_action.setEnabled(False)
 
     def show_settings_dialog(self):
         settings_dialog = SettingsDialog(self.settings_manager, self)
@@ -398,7 +403,8 @@ class MainWindow(QMainWindow):
     
     def closeEvent(self, a0):
         self.save_window_position()
-        a0.accept()
+        if a0 is not None and hasattr(a0, 'accept'):
+            a0.accept()
 
     def autosave(self):
         self.save_data()
