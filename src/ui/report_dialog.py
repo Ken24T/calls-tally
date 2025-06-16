@@ -93,13 +93,12 @@ class ReportDialog(QDialog):
             return
         sources = ["google", "c-fox", "courses.com.au", "organic", "agents"]
         section_types = [("Connects", "connects"), ("Non-Connects", "nonconnects")]
+        misc_fields = ["sms", "email"]
         def aggregate_section(data, section_key):
-            # section_key: 'current_leads' or 'prospects'
-            # Returns: {section_type: {source: total}}
             result = {stype: {src: 0 for src in sources} for stype, _ in section_types}
+            misc_totals = {k: 0 for k in misc_fields}
             for entry in data:
                 section = entry.get(section_key, {})
-                # Backward compatibility: if section missing, skip
                 if not section:
                     continue
                 for stype, suffix in section_types:
@@ -110,7 +109,12 @@ class ReportDialog(QDialog):
                         except (ValueError, TypeError):
                             value = 0
                         result[stype][src] += value
-            return result
+                for misc in misc_fields:
+                    try:
+                        misc_totals[misc] += int(section.get(misc, 0))
+                    except (ValueError, TypeError):
+                        pass
+            return result, misc_totals
         report_lines = []
         if user_name:
             report_lines.append(f"Call Tracker Report for {user_name}")
@@ -119,12 +123,15 @@ class ReportDialog(QDialog):
         report_lines.append(f"Period: {start_date_str} to {end_date_str}")
         for tab_label, section_key in [("Current Leads", "current_leads"), ("Prospects", "prospects")]:
             report_lines.append(f"\n=== {tab_label} ===")
-            agg = aggregate_section(data, section_key)
+            agg, misc_totals = aggregate_section(data, section_key)
             for stype, _ in section_types:
                 report_lines.append(f"\n{stype} Totals:")
                 for src in sources:
                     label = src.replace("courses.com.au", "Courses.com.au").replace("c-fox", "C-FOX").capitalize()
                     report_lines.append(f"  {label}: {agg[stype][src]}")
+            report_lines.append("\nOther Totals:")
+            for misc in misc_fields:
+                report_lines.append(f"  {misc.upper()}: {misc_totals[misc]}")
         report_text = "\n".join(report_lines)
         self.report_display.setText(report_text)
         self.current_generated_text = report_text

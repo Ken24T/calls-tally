@@ -21,12 +21,13 @@ class MainWindow(QMainWindow):
         
         # Set up the main window
         self.setWindowTitle("Call Tracker App")
-        self.setFixedSize(300, 800)  # Reduced from 900 to 800 to fit new layout
+        self.setFixedSize(300, 860)  # Increased from 800 to 860 for better fit
         
         # Apply window position if remember setting is enabled
         self.apply_window_position()
         
         # Create central widget and layout
+        
         self.central_widget = QWidget()
         self.central_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.setCentralWidget(self.central_widget)
@@ -129,16 +130,17 @@ class MainWindow(QMainWindow):
         
         # Counters tab widget
         tab_widget = QTabWidget()
-        tab_widget.setMinimumHeight(440)
-        tab_widget.setMaximumHeight(440)
+        tab_widget.setMinimumHeight(480)  # Increased from 440 to 480
+        tab_widget.setMaximumHeight(480)
         tab_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         # --- Helper for section creation ---
         def add_section(layout, section_label, sources, suffix):
             layout.addRow(QLabel(f"<b>{section_label}</b>"))
             counters = {}
-            for source in sources:
+            for idx, source in enumerate(sources):
                 field_name = f"{source.lower()}_{suffix}"
-                label = source.replace("courses.com.au", "Courses.com.au").replace("c-fox", "C-FOX").capitalize() + f" {section_label}"
+                # Only show the source name, not the section label, in the spinner label
+                label = source.replace("courses.com.au", "Courses.com.au").replace("c-fox", "C-FOX").capitalize()
                 counter_layout = QHBoxLayout()
                 spin_box = QSpinBox()
                 spin_box.setMinimum(0)
@@ -151,7 +153,25 @@ class MainWindow(QMainWindow):
                 counter_layout.addWidget(spin_box)
                 layout.addRow(label, counter_layout)
                 counters[field_name] = spin_box
+                # Insert bold 'Other' label after 'Agents Non-Connects' in Non-Connects section
+                if section_label == "Non-Connects" and source.lower() == "agents":
+                    layout.addRow(QLabel("<b>Other</b>"), QLabel(""))  # Bold 'Other' label
             return counters
+        def add_misc_group(layout):
+            misc_counters = {}
+            for misc in ["SMS", "Email"]:
+                field_name = misc.lower()
+                spin_box = QSpinBox()
+                spin_box.setMinimum(0)
+                spin_box.setMaximum(999)
+                spin_box.setMinimumHeight(31)
+                spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+                spin_box.setFixedWidth(70)
+                spin_box.valueChanged.connect(self.mark_dirty)
+                spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
+                layout.addRow(misc, spin_box)
+                misc_counters[field_name] = spin_box
+            return misc_counters
         sources = ["google", "c-fox", "courses.com.au", "organic", "agents"]
         # --- Current Leads Tab ---
         current_leads_widget = QWidget()
@@ -161,6 +181,7 @@ class MainWindow(QMainWindow):
         self.counters = {}
         self.counters.update(add_section(current_leads_layout, "Connects", sources, "connects"))
         self.counters.update(add_section(current_leads_layout, "Non-Connects", sources, "nonconnects"))
+        self.counters.update(add_misc_group(current_leads_layout))
         tab_widget.addTab(current_leads_widget, "Current Leads")
 
         # --- Prospects Tab ---
@@ -171,6 +192,7 @@ class MainWindow(QMainWindow):
         self.prospects_counters = {}
         self.prospects_counters.update(add_section(prospects_layout, "Connects", sources, "connects"))
         self.prospects_counters.update(add_section(prospects_layout, "Non-Connects", sources, "nonconnects"))
+        self.prospects_counters.update(add_misc_group(prospects_layout))
         tab_widget.addTab(prospects_widget, "Prospects")
 
         self.main_layout.addWidget(tab_widget)
@@ -186,7 +208,7 @@ class MainWindow(QMainWindow):
         comments_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         # self.main_layout.addWidget(comments_label) # Commented out to hide the label
         self.comments_edit = QTextEdit()
-        self.comments_edit.setFixedHeight(120)  # Double the previous height (was 60)
+        self.comments_edit.setFixedHeight(120)  # Increased from 50 to 120 for better space usage
         self.comments_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         # Connect mark_dirty before autosave
         self.comments_edit.textChanged.connect(self.mark_dirty)
@@ -274,14 +296,17 @@ class MainWindow(QMainWindow):
             date_str = date_str_override
         else:
             date_str = self.date_edit.date().toString("yyyy-MM-dd")
-        current_leads_data = {field_name: spin_box.value() for field_name, spin_box in self.counters.items()}
-        prospects_data = {field_name: spin_box.value() for field_name, spin_box in self.prospects_counters.items()}
+        # Separate out misc fields
+        current_leads_data = {k: v.value() for k, v in self.counters.items() if k not in ["sms", "email"]}
+        current_leads_misc = {k: v.value() for k, v in self.counters.items() if k in ["sms", "email"]}
+        prospects_data = {k: v.value() for k, v in self.prospects_counters.items() if k not in ["sms", "email"]}
+        prospects_misc = {k: v.value() for k, v in self.prospects_counters.items() if k in ["sms", "email"]}
         entry_data = {
             "user": self.user_combo.currentText(),
             "date": date_str,
             "comments": self.comments_edit.toPlainText(),
-            "current_leads": current_leads_data,
-            "prospects": prospects_data
+            "current_leads": {**current_leads_data, **current_leads_misc},
+            "prospects": {**prospects_data, **prospects_misc}
         }
         self.data_manager.save_entry(entry_data)
         self.dirty = False
@@ -294,14 +319,12 @@ class MainWindow(QMainWindow):
             return
         date_str = self.date_edit.date().toString("yyyy-MM-dd")
         entry = self.data_manager.get_entry_for_user_and_date(user, date_str)
-        # Block signals so programmatic updates don’t trigger autosave.
         self.comments_edit.blockSignals(True)
         for spin_box in self.counters.values():
             spin_box.blockSignals(True)
         for spin_box in self.prospects_counters.values():
             spin_box.blockSignals(True)
         if entry:
-            # Backward compatibility: if old format, fill current_leads from flat keys
             if "current_leads" in entry:
                 for key, spin_box in self.counters.items():
                     spin_box.setValue(entry["current_leads"].get(key, 0))
