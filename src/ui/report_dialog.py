@@ -131,6 +131,23 @@ class ReportDialog(QDialog):
             report_lines.append("\nOther Totals:")
             for misc in misc_fields:
                 report_lines.append(f"  {misc.upper()}: {misc_totals[misc]}")
+        
+        # Add comments/notes section
+        comments_with_dates = []
+        for entry in data:
+            comment = entry.get("comments", "").strip()
+            if comment:
+                date = entry.get("date", "")
+                comments_with_dates.append((date, comment))
+        
+        if comments_with_dates:
+            # Sort by date
+            comments_with_dates.sort(key=lambda x: x[0])
+            report_lines.append("\n=== Notes ===")
+            for date, comment in comments_with_dates:
+                report_lines.append(f"\n{date}:")
+                report_lines.append(f"  {comment}")
+        
         report_text = "\n".join(report_lines)
         self.report_display.setText(report_text)
         self.current_generated_text = report_text
