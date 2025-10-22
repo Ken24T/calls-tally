@@ -116,9 +116,9 @@ class ReportDialog(QDialog):
             return result, misc_totals
         report_lines = []
         if user_name:
-            report_lines.append(f"Call Tracker Report for {user_name}")
+            report_lines.append(f"Touch-Point Tracker Report for {user_name}")
         else:
-            report_lines.append("Call Tracker Report")
+            report_lines.append("Touch-Point Tracker Report")
         report_lines.append(f"Period: {start_date_str} to {end_date_str}")
         for tab_label, section_key in [("Current Leads", "current_leads"), ("Prospects", "prospects")]:
             report_lines.append(f"\n=== {tab_label} ===")
@@ -147,7 +147,7 @@ class ReportDialog(QDialog):
             to_email = self.email_to.text().strip()
             start_date_str = self.start_date.date().toString("yyyy-MM-dd")
             end_date_str = self.end_date.date().toString("yyyy-MM-dd")
-            subject = f"Call Tracker Report {start_date_str} to {end_date_str}"
+            subject = f"Touch-Point Tracker Report {start_date_str} to {end_date_str}"
 
             mailto_parts = []
             if to_email:

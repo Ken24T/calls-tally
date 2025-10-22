@@ -36,7 +36,7 @@ def main():
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--noconsole",
-        "--name", "call-tracker",
+        "--name", "touch-point-tracker",
         "--add-data", r"styles.qss;.",     # Include stylesheet in the root
         "--add-data", r"data\*.json;data",
     ]

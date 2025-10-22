@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
         self.data_manager = DataManager('data/tally_data.json')
         
         # Set up the main window
-        self.setWindowTitle("Call Tracker App")
+        self.setWindowTitle("Touch-Point Tracker")
         self.setFixedSize(300, 860)  # Increased from 800 to 860 for better fit
         
         # Apply window position if remember setting is enabled
