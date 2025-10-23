@@ -1,6 +1,11 @@
+/* Validum Institute Color Theme */
+/* Primary: Navy Blue #1B3A5F */
+/* Secondary: Cyan/Turquoise #00BCD4 */
+/* Accent: Light Blue #3498db */
+
 /* Main application styling */
 QMainWindow {
-    background-color: #f5f5f5;
+    background-color: #f0f4f8;
 }
 
 QWidget {
@@ -10,7 +15,8 @@ QWidget {
 
 /* Form elements */
 QLabel {
-    color: #333333;
+    color: #1B3A5F;
+    font-weight: 500;
 }
 
 QLabel#required-field::after {
@@ -20,41 +26,49 @@ QLabel#required-field::after {
 
 QComboBox, QDateEdit, QLineEdit, QTextEdit, QSpinBox {
     padding: 8px;
-    border: 1px solid #dcdcdc;
+    border: 2px solid #c8d9e6;
     border-radius: 4px;
     background-color: white;
+    color: #1B3A5F;
+}
+
+QComboBox:focus, QDateEdit:focus, QLineEdit:focus, QTextEdit:focus, QSpinBox:focus {
+    border: 2px solid #00BCD4;
 }
 
 QSpinBox::up-button, QSpinBox::down-button {
     width: 20px;
-    background-color: #f0f0f0;
-    border: 1px solid #dcdcdc;
+    background-color: #e8f1f8;
+    border: 1px solid #c8d9e6;
     border-radius: 3px;
 }
 
 QSpinBox::up-button:hover, QSpinBox::down-button:hover {
-    background-color: #e0e0e0;
+    background-color: #00BCD4;
+    border-color: #00BCD4;
 }
 
 /* Buttons */
 QPushButton {
     padding: 8px 16px;
     border-radius: 4px;
-    border: 1px solid #dcdcdc;
-    background-color: #f0f0f0;
-    color: #333333;
+    border: 2px solid #c8d9e6;
+    background-color: white;
+    color: #1B3A5F;
+    font-weight: 500;
 }
 
 QPushButton:hover {
-    background-color: #e0e0e0;
+    background-color: #e8f1f8;
+    border-color: #00BCD4;
 }
 
 QPushButton:pressed {
-    background-color: #d0d0d0;
+    background-color: #c8d9e6;
 }
 
 QPushButton#primary-button {
-    background-color: #2980b9;
+    background-color: #1B3A5F;
     color: white;
     border: none;
     font-weight: bold;
@@ -62,53 +76,99 @@ QPushButton#primary-button {
 }
 
 QPushButton#primary-button:hover {
-    background-color: #3498db;
+    background-color: #00BCD4;
 }
 
 QPushButton#primary-button:pressed {
-    background-color: #1c638e;
+    background-color: #008fa6;
 }
 
 /* Group Box (for counters) */
 QGroupBox {
-    border: 1px solid #dcdcdc;
+    border: 2px solid #c8d9e6;
     border-radius: 6px;
     margin-top: 1.5ex;
     padding: 10px;
-    background-color: white;
+    background-color: #f8fbfd;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #ffffff, stop:1 #f0f7fb);
 }
 
 QGroupBox::title {
     subcontrol-origin: margin;
     subcontrol-position: top center;
-    padding: 0 3px;
-    background-color: #f5f5f5;
+    padding: 0 5px;
+    background-color: #f0f4f8;
+    color: #1B3A5F;
+    font-weight: bold;
+    font-size: 10pt;
 }
 
 /* Menu styling */
 QMenuBar {
-    background-color: #f8f8f8;
-    border-bottom: 1px solid #dcdcdc;
+    background-color: #1B3A5F;
+    border-bottom: 2px solid #00BCD4;
+    color: white;
 }
 
 QMenuBar::item {
-    padding: 6px 10px;
+    padding: 6px 12px;
     background: transparent;
+    color: white;
 }
 
 QMenuBar::item:selected {
-    background: #e0e0e0;
+    background: #00BCD4;
+    color: white;
 }
 
 QMenu {
     background-color: white;
-    border: 1px solid #dcdcdc;
+    border: 2px solid #c8d9e6;
 }
 
 QMenu::item {
     padding: 6px 25px 6px 20px;
+    color: #1B3A5F;
 }
 
 QMenu::item:selected {
-    background-color: #e0e0e0;
+    background-color: #00BCD4;
+    color: white;
+}
+
+/* Tab Widget Styling */
+QTabWidget::pane {
+    border: 2px solid #c8d9e6;
+    border-radius: 4px;
+    background-color: white;
+}
+
+QTabBar::tab {
+    background-color: #e8f1f8;
+    color: #1B3A5F;
+    padding: 8px 16px;
+    margin-right: 2px;
+    border: 2px solid #c8d9e6;
+    border-bottom: none;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    font-weight: 500;
+}
+
+QTabBar::tab:selected {
+    background-color: white;
+    border-bottom: 2px solid white;
+    color: #00BCD4;
+    font-weight: bold;
+}
+
+QTabBar::tab:hover:!selected {
+    background-color: #c8d9e6;
+}
+
+/* Scroll Area */
+QScrollArea {
+    border: none;
+    background-color: transparent;
 }

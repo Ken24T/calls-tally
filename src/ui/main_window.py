@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
     QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QFormLayout, 
-    QSpinBox, QInputDialog, QSizePolicy, QApplication, QTabWidget, QMenuBar, QGroupBox)
+    QSpinBox, QInputDialog, QSizePolicy, QApplication, QTabWidget, QMenuBar, QGroupBox, QScrollArea)
 from PyQt6.QtGui import QAction, QTextCharFormat, QFont, QGuiApplication
 from PyQt6.QtCore import QDate, Qt
 from src.ui.report_dialog import ReportDialog
@@ -21,9 +21,10 @@ class MainWindow(QMainWindow):
         
         # Set up the main window
         self.setWindowTitle("Touch-Point Tracker")
-        self.setMinimumSize(400, 950)  # Minimum size for new layout
+        self.setMinimumSize(320, 1024)
         
         # Apply window geometry (position and size) if remember setting is enabled
+        # This will either restore saved geometry or apply default size/position
         self.apply_window_geometry()
         
         # Create central widget and layout
@@ -157,9 +158,15 @@ class MainWindow(QMainWindow):
     
     def _create_metrics_tab(self, tab_name):
         """Create a metrics tab with the new structure"""
-        tab_widget = QWidget()
-        tab_layout = QVBoxLayout(tab_widget)
-        tab_layout.setSpacing(10)
+        # Create scroll area
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        
+        # Create content widget
+        content_widget = QWidget()
+        tab_layout = QVBoxLayout(content_widget)
+        tab_layout.setSpacing(12)
         tab_layout.setContentsMargins(10, 10, 10, 10)
         
         # Determine which widget dictionary to use
@@ -182,17 +189,20 @@ class MainWindow(QMainWindow):
         other_group = self._create_other_section(tab_name, widgets_dict, overrides_dict)
         tab_layout.addWidget(other_group)
         
-        # GRAND TOTAL
+        # GRAND TOTAL - bold and right-aligned, occupying ~25% width
         grand_total_layout = QHBoxLayout()
+        grand_total_layout.setSpacing(10)
+        grand_total_layout.addStretch(3)  # More stretch to push further right (75% empty space)
         grand_total_label = QLabel("<b>GRAND TOTAL:</b>")
+        grand_total_label.setMinimumWidth(90)  # Slightly reduced
         grand_total_layout.addWidget(grand_total_label)
-        grand_total_layout.addStretch()
         
-        grand_total_spinbox = QSpinBox()
-        grand_total_spinbox.setMinimum(0)
-        grand_total_spinbox.setMaximum(99999)
-        grand_total_spinbox.setFixedWidth(100)
+        grand_total_spinbox = self._configure_spinbox(QSpinBox(), 0, 99999, min_width=60)  # Reduced min width
         grand_total_spinbox.setObjectName("grand-total")
+        # Make font bold
+        font = grand_total_spinbox.font()
+        font.setBold(True)
+        grand_total_spinbox.setFont(font)
         grand_total_spinbox.valueChanged.connect(lambda: self._on_total_manually_changed("grand_total", tab_name))
         widgets_dict["grand_total"] = grand_total_spinbox
         overrides_dict["grand_total"] = False
@@ -203,17 +213,17 @@ class MainWindow(QMainWindow):
         # Additional Metrics Section
         additional_group = QGroupBox("Additional Metrics")
         additional_layout = QFormLayout()
-        additional_layout.setSpacing(8)
+        additional_layout.setSpacing(10)
+        additional_layout.setContentsMargins(15, 20, 15, 15)
+        additional_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        additional_layout.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
         
         for metric_name, display_name in [
             ("enrolment_packs", "Enrolment Packs"),
             ("quotes", "Quotes"),
             ("cpd_booked", "CPD Booked")
         ]:
-            spinbox = QSpinBox()
-            spinbox.setMinimum(0)
-            spinbox.setMaximum(999)
-            spinbox.setFixedWidth(100)
+            spinbox = self._configure_spinbox(QSpinBox(), 0, 999)
             spinbox.valueChanged.connect(lambda val, mn=metric_name, tn=tab_name: self._on_additional_metric_changed(mn, tn))
             additional_layout.addRow(display_name + ":", spinbox)
             widgets_dict[metric_name] = spinbox
@@ -221,32 +231,58 @@ class MainWindow(QMainWindow):
         additional_group.setLayout(additional_layout)
         tab_layout.addWidget(additional_group)
         
-        # GRAND TOTAL 2
+        # GRAND TOTAL 2 - bold and right-aligned, occupying ~25% width
         grand_total_2_layout = QHBoxLayout()
+        grand_total_2_layout.setSpacing(10)
+        grand_total_2_layout.addStretch(3)  # More stretch to push further right (75% empty space)
         grand_total_2_label = QLabel("<b>GRAND TOTAL:</b>")
+        grand_total_2_label.setMinimumWidth(90)  # Slightly reduced
         grand_total_2_layout.addWidget(grand_total_2_label)
-        grand_total_2_layout.addStretch()
         
-        grand_total_2_spinbox = QSpinBox()
-        grand_total_2_spinbox.setMinimum(0)
-        grand_total_2_spinbox.setMaximum(99999)
-        grand_total_2_spinbox.setFixedWidth(100)
+        grand_total_2_spinbox = self._configure_spinbox(QSpinBox(), 0, 99999, min_width=60)  # Reduced min width
         grand_total_2_spinbox.setObjectName("grand-total")
+        # Make font bold
+        font = grand_total_2_spinbox.font()
+        font.setBold(True)
+        grand_total_2_spinbox.setFont(font)
         grand_total_2_spinbox.valueChanged.connect(lambda: self._on_total_manually_changed("grand_total_2", tab_name))
         widgets_dict["grand_total_2"] = grand_total_2_spinbox
         overrides_dict["grand_total_2"] = False
         grand_total_2_layout.addWidget(grand_total_2_spinbox)
         
         tab_layout.addLayout(grand_total_2_layout)
-        tab_layout.addStretch()
+        # Removed addStretch() to eliminate large gap before Notes box
         
-        return tab_widget
+        # Set content widget and return scroll area
+        scroll.setWidget(content_widget)
+        return scroll
+    
+    def _configure_spinbox(self, spinbox, min_val, max_val, min_width=80):
+        """Helper to configure spinbox with appropriate sizing"""
+        spinbox.setMinimum(min_val)
+        spinbox.setMaximum(max_val)
+        spinbox.setMinimumWidth(min_width)
+        spinbox.setMinimumHeight(32)  # Increased to 32 to prevent bottom cutoff
+        spinbox.setMaximumHeight(32)
+        spinbox.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        # Reduce internal padding and adjust alignment for better number visibility
+        spinbox.setStyleSheet("""
+            QSpinBox { 
+                padding: 4px 4px 4px 4px !important; 
+                padding-left: 6px !important;
+            }
+        """)
+        spinbox.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        return spinbox
     
     def _create_call_section(self, title, section_key, tab_name, widgets_dict, overrides_dict):
         """Create a CALL section (Connects, Non-Connects, or In Betweens)"""
         group = QGroupBox(title)
         layout = QFormLayout()
-        layout.setSpacing(8)
+        layout.setSpacing(10)
+        layout.setContentsMargins(15, 20, 15, 15)
+        layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        layout.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
         
         # Create nested dictionary for this section
         widgets_dict[section_key] = {}
@@ -258,22 +294,28 @@ class MainWindow(QMainWindow):
             ("organic_lead", "Organic Lead"),
             ("agents", "Agents")
         ]:
-            spinbox = QSpinBox()
-            spinbox.setMinimum(0)
-            spinbox.setMaximum(999)
-            spinbox.setFixedWidth(100)
+            spinbox = self._configure_spinbox(QSpinBox(), 0, 999)
             spinbox.valueChanged.connect(lambda val, sk=section_key, tn=tab_name: self._on_section_value_changed(sk, tn))
             layout.addRow(display_name + ":", spinbox)
             widgets_dict[section_key][field_name] = spinbox
         
-        # Add Total field (editable)
-        total_spinbox = QSpinBox()
-        total_spinbox.setMinimum(0)
-        total_spinbox.setMaximum(9999)
-        total_spinbox.setFixedWidth(100)
+        # Add Total field (editable) - bold and right-aligned, occupying ~25% width
+        total_layout = QHBoxLayout()
+        total_layout.addStretch(3)  # More stretch to push further right (75% empty space)
+        total_label = QLabel("<b>Total:</b>")
+        total_label.setMinimumWidth(50)  # Reduced from 80
+        total_layout.addWidget(total_label)
+        
+        total_spinbox = self._configure_spinbox(QSpinBox(), 0, 9999, min_width=60)  # Reduced min width
         total_spinbox.setObjectName("total-field")
+        # Make font bold
+        font = total_spinbox.font()
+        font.setBold(True)
+        total_spinbox.setFont(font)
         total_spinbox.valueChanged.connect(lambda: self._on_section_total_manually_changed(section_key, tab_name))
-        layout.addRow("<b>Total:</b>", total_spinbox)
+        total_layout.addWidget(total_spinbox)
+        
+        layout.addRow(total_layout)
         widgets_dict[section_key]["total"] = total_spinbox
         
         group.setLayout(layout)
@@ -283,28 +325,37 @@ class MainWindow(QMainWindow):
         """Create the OTHER section (SMS, Email)"""
         group = QGroupBox("OTHER")
         layout = QFormLayout()
-        layout.setSpacing(8)
+        layout.setSpacing(10)
+        layout.setContentsMargins(15, 20, 15, 15)
+        layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        layout.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
         
         widgets_dict["other"] = {}
         overrides_dict["other"] = False
         
         for field_name, display_name in [("sms", "SMS"), ("email", "Email")]:
-            spinbox = QSpinBox()
-            spinbox.setMinimum(0)
-            spinbox.setMaximum(999)
-            spinbox.setFixedWidth(100)
+            spinbox = self._configure_spinbox(QSpinBox(), 0, 999)
             spinbox.valueChanged.connect(lambda val, tn=tab_name: self._on_other_value_changed(tn))
             layout.addRow(display_name + ":", spinbox)
             widgets_dict["other"][field_name] = spinbox
         
-        # Add Total field
-        total_spinbox = QSpinBox()
-        total_spinbox.setMinimum(0)
-        total_spinbox.setMaximum(9999)
-        total_spinbox.setFixedWidth(100)
+        # Add Total field - bold and right-aligned, occupying ~25% width
+        total_layout = QHBoxLayout()
+        total_layout.addStretch(3)  # More stretch to push further right (75% empty space)
+        total_label = QLabel("<b>Total:</b>")
+        total_label.setMinimumWidth(50)  # Reduced from 80
+        total_layout.addWidget(total_label)
+        
+        total_spinbox = self._configure_spinbox(QSpinBox(), 0, 9999, min_width=60)  # Reduced min width
         total_spinbox.setObjectName("total-field")
+        # Make font bold
+        font = total_spinbox.font()
+        font.setBold(True)
+        total_spinbox.setFont(font)
         total_spinbox.valueChanged.connect(lambda: self._on_other_total_manually_changed(tab_name))
-        layout.addRow("<b>Total:</b>", total_spinbox)
+        total_layout.addWidget(total_spinbox)
+        
+        layout.addRow(total_layout)
         widgets_dict["other"]["total"] = total_spinbox
         
         group.setLayout(layout)
@@ -319,13 +370,25 @@ class MainWindow(QMainWindow):
         widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
         overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
         
-        # Only recalculate if not manually overridden
-        if not overrides_dict.get(section_key, False):
-            total = self._calculate_section_total(widgets_dict[section_key])
-            widgets_dict[section_key]["total"].blockSignals(True)
-            widgets_dict[section_key]["total"].setValue(total)
-            widgets_dict[section_key]["total"].setStyleSheet("")  # Clear override styling
-            widgets_dict[section_key]["total"].blockSignals(False)
+        # Calculate the new total
+        calculated_total = self._calculate_section_total(widgets_dict[section_key])
+        override_amount = overrides_dict.get(section_key, 0)
+        
+        # Apply override if it exists
+        new_total = calculated_total + override_amount
+        
+        widgets_dict[section_key]["total"].blockSignals(True)
+        widgets_dict[section_key]["total"].setValue(new_total)
+        
+        # Update styling based on override
+        if override_amount != 0:
+            widgets_dict[section_key]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict[section_key]["total"].setToolTip(f"Override: {override_amount:+d} from calculated value")
+        else:
+            widgets_dict[section_key]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict[section_key]["total"].setToolTip("")
+        
+        widgets_dict[section_key]["total"].blockSignals(False)
         
         # Recalculate grand total
         self._recalculate_grand_total(tab_name)
@@ -337,11 +400,20 @@ class MainWindow(QMainWindow):
         overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
         widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
         
-        # Mark as overridden
-        overrides_dict[section_key] = True
-        # Apply visual indicator
-        widgets_dict[section_key]["total"].setStyleSheet("background-color: #FFFACD;")
-        widgets_dict[section_key]["total"].setToolTip("Manually overridden. Change component values to reset.")
+        # Calculate what it should be automatically
+        auto_total = self._calculate_section_total(widgets_dict[section_key])
+        manual_total = widgets_dict[section_key]["total"].value()
+        
+        # Store the difference as the override amount
+        overrides_dict[section_key] = manual_total - auto_total
+        
+        # Apply visual indicator if there's an override
+        if overrides_dict[section_key] != 0:
+            widgets_dict[section_key]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict[section_key]["total"].setToolTip(f"Override: {overrides_dict[section_key]:+d} from calculated value")
+        else:
+            widgets_dict[section_key]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict[section_key]["total"].setToolTip("")
         
         # Recalculate grand total
         self._recalculate_grand_total(tab_name)
@@ -353,13 +425,25 @@ class MainWindow(QMainWindow):
         widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
         overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
         
-        # Only recalculate if not manually overridden
-        if not overrides_dict.get("other", False):
-            total = widgets_dict["other"]["sms"].value() + widgets_dict["other"]["email"].value()
-            widgets_dict["other"]["total"].blockSignals(True)
-            widgets_dict["other"]["total"].setValue(total)
-            widgets_dict["other"]["total"].setStyleSheet("")
-            widgets_dict["other"]["total"].blockSignals(False)
+        # Calculate the new total
+        calculated_total = widgets_dict["other"]["sms"].value() + widgets_dict["other"]["email"].value()
+        override_amount = overrides_dict.get("other", 0)
+        
+        # Apply override if it exists
+        new_total = calculated_total + override_amount
+        
+        widgets_dict["other"]["total"].blockSignals(True)
+        widgets_dict["other"]["total"].setValue(new_total)
+        
+        # Update styling based on override
+        if override_amount != 0:
+            widgets_dict["other"]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict["other"]["total"].setToolTip(f"Override: {override_amount:+d} from calculated value")
+        else:
+            widgets_dict["other"]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict["other"]["total"].setToolTip("")
+        
+        widgets_dict["other"]["total"].blockSignals(False)
         
         # Recalculate grand total
         self._recalculate_grand_total(tab_name)
@@ -371,9 +455,20 @@ class MainWindow(QMainWindow):
         overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
         widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
         
-        overrides_dict["other"] = True
-        widgets_dict["other"]["total"].setStyleSheet("background-color: #FFFACD;")
-        widgets_dict["other"]["total"].setToolTip("Manually overridden. Change SMS/Email to reset.")
+        # Calculate what it should be automatically
+        auto_total = widgets_dict["other"]["sms"].value() + widgets_dict["other"]["email"].value()
+        manual_total = widgets_dict["other"]["total"].value()
+        
+        # Store the difference as the override amount
+        overrides_dict["other"] = manual_total - auto_total
+        
+        # Apply visual indicator if there's an override
+        if overrides_dict["other"] != 0:
+            widgets_dict["other"]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict["other"]["total"].setToolTip(f"Override: {overrides_dict['other']:+d} from calculated value")
+        else:
+            widgets_dict["other"]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict["other"]["total"].setToolTip("")
         
         self._recalculate_grand_total(tab_name)
         self.mark_dirty()
@@ -390,9 +485,29 @@ class MainWindow(QMainWindow):
         overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
         widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
         
-        overrides_dict[total_type] = True
-        widgets_dict[total_type].setStyleSheet("background-color: #FFFACD;")
-        widgets_dict[total_type].setToolTip("Manually overridden. Change component values to reset.")
+        # Calculate what it should be automatically
+        if total_type == "grand_total":
+            auto_total = (widgets_dict["call_connects"]["total"].value() +
+                         widgets_dict["call_nonconnects"]["total"].value() +
+                         widgets_dict["call_inbetweens"]["total"].value() +
+                         widgets_dict["other"]["total"].value())
+        else:  # grand_total_2
+            auto_total = (widgets_dict["enrolment_packs"].value() +
+                         widgets_dict["quotes"].value() +
+                         widgets_dict["cpd_booked"].value())
+        
+        manual_total = widgets_dict[total_type].value()
+        
+        # Store the difference as the override amount
+        overrides_dict[total_type] = manual_total - auto_total
+        
+        # Apply visual indicator if there's an override
+        if overrides_dict[total_type] != 0:
+            widgets_dict[total_type].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict[total_type].setToolTip(f"Override: {overrides_dict[total_type]:+d} from calculated value")
+        else:
+            widgets_dict[total_type].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict[total_type].setToolTip("")
         
         self.mark_dirty()
         self.autosave()
@@ -408,33 +523,55 @@ class MainWindow(QMainWindow):
         widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
         overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
         
-        # Only recalculate if not manually overridden
-        if not overrides_dict.get("grand_total", False):
-            total = (widgets_dict["call_connects"]["total"].value() +
-                    widgets_dict["call_nonconnects"]["total"].value() +
-                    widgets_dict["call_inbetweens"]["total"].value() +
-                    widgets_dict["other"]["total"].value())
-            
-            widgets_dict["grand_total"].blockSignals(True)
-            widgets_dict["grand_total"].setValue(total)
-            widgets_dict["grand_total"].setStyleSheet("")
-            widgets_dict["grand_total"].blockSignals(False)
+        # Calculate the new total
+        calculated_total = (widgets_dict["call_connects"]["total"].value() +
+                           widgets_dict["call_nonconnects"]["total"].value() +
+                           widgets_dict["call_inbetweens"]["total"].value() +
+                           widgets_dict["other"]["total"].value())
+        override_amount = overrides_dict.get("grand_total", 0)
+        
+        # Apply override if it exists
+        new_total = calculated_total + override_amount
+        
+        widgets_dict["grand_total"].blockSignals(True)
+        widgets_dict["grand_total"].setValue(new_total)
+        
+        # Update styling based on override
+        if override_amount != 0:
+            widgets_dict["grand_total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict["grand_total"].setToolTip(f"Override: {override_amount:+d} from calculated value")
+        else:
+            widgets_dict["grand_total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict["grand_total"].setToolTip("")
+        
+        widgets_dict["grand_total"].blockSignals(False)
     
     def _recalculate_grand_total_2(self, tab_name):
         """Recalculate GRAND TOTAL 2 (sum of additional metrics)"""
         widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
         overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
         
-        # Only recalculate if not manually overridden
-        if not overrides_dict.get("grand_total_2", False):
-            total = (widgets_dict["enrolment_packs"].value() +
-                    widgets_dict["quotes"].value() +
-                    widgets_dict["cpd_booked"].value())
-            
-            widgets_dict["grand_total_2"].blockSignals(True)
-            widgets_dict["grand_total_2"].setValue(total)
-            widgets_dict["grand_total_2"].setStyleSheet("")
-            widgets_dict["grand_total_2"].blockSignals(False)
+        # Calculate the new total
+        calculated_total = (widgets_dict["enrolment_packs"].value() +
+                           widgets_dict["quotes"].value() +
+                           widgets_dict["cpd_booked"].value())
+        override_amount = overrides_dict.get("grand_total_2", 0)
+        
+        # Apply override if it exists
+        new_total = calculated_total + override_amount
+        
+        widgets_dict["grand_total_2"].blockSignals(True)
+        widgets_dict["grand_total_2"].setValue(new_total)
+        
+        # Update styling based on override
+        if override_amount != 0:
+            widgets_dict["grand_total_2"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict["grand_total_2"].setToolTip(f"Override: {override_amount:+d} from calculated value")
+        else:
+            widgets_dict["grand_total_2"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict["grand_total_2"].setToolTip("")
+        
+        widgets_dict["grand_total_2"].blockSignals(False)
     
     def _recalculate_all_totals(self):
         """Recalculate all totals for both tabs"""
@@ -788,14 +925,14 @@ class MainWindow(QMainWindow):
         """Apply saved window position and size, or use defaults"""
         if self.settings_manager.get('remember_window_position', False):
             geometry = self.settings_manager.get('window_position', {
-                'x': 100, 'y': 100, 'width': 400, 'height': 950, 'screen_name': ''
+                'x': 100, 'y': 100, 'width': 320, 'height': 1024, 'screen_name': ''
             })
             
             # Extract values
             x = geometry.get('x', 100)
             y = geometry.get('y', 100)
-            width = geometry.get('width', 400)
-            height = geometry.get('height', 950)
+            width = geometry.get('width', 320)
+            height = geometry.get('height', 1024)
             screen_name = geometry.get('screen_name', '')
             
             # Find target screen
@@ -818,12 +955,12 @@ class MainWindow(QMainWindow):
             self.setGeometry(x, y, width, height)
         else:
             # Use default size and center on screen
-            self.resize(400, 950)
+            self.resize(320, 1024)
             screen = QGuiApplication.primaryScreen()
             if screen:
                 screen_geometry = screen.availableGeometry()
-                center_x = screen_geometry.x() + (screen_geometry.width() - 400) // 2
-                center_y = screen_geometry.y() + (screen_geometry.height() - 950) // 2
+                center_x = screen_geometry.x() + (screen_geometry.width() - 320) // 2
+                center_y = screen_geometry.y() + (screen_geometry.height() - 1024) // 2
                 self.move(center_x, center_y)
 
     def save_window_geometry(self):
@@ -844,3 +981,13 @@ class MainWindow(QMainWindow):
                 'screen_name': screen_name
             }
             self.settings_manager.set('window_position', geometry_data)
+        else:
+            # Reset to defaults when not remembering position
+            default_geometry = {
+                'x': 100,
+                'y': 100,
+                'width': 320,
+                'height': 1024,
+                'screen_name': ''
+            }
+            self.settings_manager.set('window_position', default_geometry)

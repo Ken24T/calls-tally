@@ -90,47 +90,115 @@ class ReportDialog(QDialog):
             self.report_display.setText("No data found for the selected date range.")
             self.send_btn.setEnabled(False)
             return
-        sources = ["google", "c-fox", "courses.com.au", "organic", "agents"]
-        section_types = [("Connects", "connects"), ("Non-Connects", "nonconnects")]
-        misc_fields = ["sms", "email"]
-        def aggregate_section(data, section_key):
-            result = {stype: {src: 0 for src in sources} for stype, _ in section_types}
-            misc_totals = {k: 0 for k in misc_fields}
+        
+        def aggregate_new_structure(data, section_key):
+            """Aggregate data for new schema structure"""
+            result = {
+                'call_connects': {'paid_lead': 0, 'organic_lead': 0, 'agents': 0, 'total': 0},
+                'call_nonconnects': {'paid_lead': 0, 'organic_lead': 0, 'agents': 0, 'total': 0},
+                'call_inbetweens': {'paid_lead': 0, 'organic_lead': 0, 'agents': 0, 'total': 0},
+                'other': {'sms': 0, 'email': 0, 'total': 0},
+                'grand_total': 0,
+                'enrolment_packs': 0,
+                'quotes': 0,
+                'cpd_booked': 0,
+                'grand_total_2': 0
+            }
+            
             for entry in data:
                 section = entry.get(section_key, {})
                 if not section:
                     continue
-                for stype, suffix in section_types:
-                    for src in sources:
-                        key = f"{src}_{suffix}"
+                
+                # Aggregate each call section
+                for call_section in ['call_connects', 'call_nonconnects', 'call_inbetweens']:
+                    call_data = section.get(call_section, {})
+                    for field in ['paid_lead', 'organic_lead', 'agents', 'total']:
                         try:
-                            value = int(section.get(key, 0))
+                            result[call_section][field] += int(call_data.get(field, 0))
                         except (ValueError, TypeError):
-                            value = 0
-                        result[stype][src] += value
-                for misc in misc_fields:
+                            pass
+                
+                # Aggregate OTHER
+                other_data = section.get('other', {})
+                for field in ['sms', 'email', 'total']:
                     try:
-                        misc_totals[misc] += int(section.get(misc, 0))
+                        result['other'][field] += int(other_data.get(field, 0))
                     except (ValueError, TypeError):
                         pass
-            return result, misc_totals
+                
+                # Aggregate grand totals and additional metrics
+                try:
+                    result['grand_total'] += int(section.get('grand_total', 0))
+                except (ValueError, TypeError):
+                    pass
+                try:
+                    result['enrolment_packs'] += int(section.get('enrolment_packs', 0))
+                except (ValueError, TypeError):
+                    pass
+                try:
+                    result['quotes'] += int(section.get('quotes', 0))
+                except (ValueError, TypeError):
+                    pass
+                try:
+                    result['cpd_booked'] += int(section.get('cpd_booked', 0))
+                except (ValueError, TypeError):
+                    pass
+                try:
+                    result['grand_total_2'] += int(section.get('grand_total_2', 0))
+                except (ValueError, TypeError):
+                    pass
+            
+            return result
+        
         report_lines = []
         if user_name:
             report_lines.append(f"Touch-Point Tracker Report for {user_name}")
         else:
             report_lines.append("Touch-Point Tracker Report")
         report_lines.append(f"Period: {start_date_str} to {end_date_str}")
+        
         for tab_label, section_key in [("Current Leads", "current_leads"), ("Prospects", "prospects")]:
             report_lines.append(f"\n=== {tab_label} ===")
-            agg, misc_totals = aggregate_section(data, section_key)
-            for stype, _ in section_types:
-                report_lines.append(f"\n{stype} Totals:")
-                for src in sources:
-                    label = src.replace("courses.com.au", "Courses.com.au").replace("c-fox", "C-FOX").capitalize()
-                    report_lines.append(f"  {label}: {agg[stype][src]}")
-            report_lines.append("\nOther Totals:")
-            for misc in misc_fields:
-                report_lines.append(f"  {misc.upper()}: {misc_totals[misc]}")
+            agg = aggregate_new_structure(data, section_key)
+            
+            # CALL - Connects
+            report_lines.append("\nCALL - Connects:")
+            report_lines.append(f"  Paid Lead: {agg['call_connects']['paid_lead']}")
+            report_lines.append(f"  Organic Lead: {agg['call_connects']['organic_lead']}")
+            report_lines.append(f"  Agents: {agg['call_connects']['agents']}")
+            report_lines.append(f"  Total: {agg['call_connects']['total']}")
+            
+            # CALL - Non-Connects
+            report_lines.append("\nCALL - Non-Connects:")
+            report_lines.append(f"  Paid Lead: {agg['call_nonconnects']['paid_lead']}")
+            report_lines.append(f"  Organic Lead: {agg['call_nonconnects']['organic_lead']}")
+            report_lines.append(f"  Agents: {agg['call_nonconnects']['agents']}")
+            report_lines.append(f"  Total: {agg['call_nonconnects']['total']}")
+            
+            # CALL - In Betweens
+            report_lines.append("\nCALL - In Betweens:")
+            report_lines.append(f"  Paid Lead: {agg['call_inbetweens']['paid_lead']}")
+            report_lines.append(f"  Organic Lead: {agg['call_inbetweens']['organic_lead']}")
+            report_lines.append(f"  Agents: {agg['call_inbetweens']['agents']}")
+            report_lines.append(f"  Total: {agg['call_inbetweens']['total']}")
+            
+            # OTHER
+            report_lines.append("\nOTHER:")
+            report_lines.append(f"  SMS: {agg['other']['sms']}")
+            report_lines.append(f"  Email: {agg['other']['email']}")
+            report_lines.append(f"  Total: {agg['other']['total']}")
+            
+            # GRAND TOTAL
+            report_lines.append(f"\nGRAND TOTAL: {agg['grand_total']}")
+            
+            # Additional Metrics
+            report_lines.append(f"\nEnrolment Packs: {agg['enrolment_packs']}")
+            report_lines.append(f"Quotes: {agg['quotes']}")
+            report_lines.append(f"CPD Booked: {agg['cpd_booked']}")
+            
+            # GRAND TOTAL 2
+            report_lines.append(f"\nGRAND TOTAL: {agg['grand_total_2']}")
         
         # Add comments/notes section
         comments_with_dates = []
