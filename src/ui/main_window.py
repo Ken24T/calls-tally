@@ -759,7 +759,7 @@ class MainWindow(QMainWindow):
                     calendar.setDateTextFormat(qdate, boldFormat)
     
     def closeEvent(self, a0):
-        self.save_window_position()
+        self.save_window_geometry()
         if a0 is not None and hasattr(a0, 'accept'):
             a0.accept()
 
@@ -781,48 +781,66 @@ class MainWindow(QMainWindow):
             )
             if reply == QMessageBox.StandardButton.No:
                 return
-        self.save_window_position()
+        self.save_window_geometry()
         QApplication.quit()
 
-    def apply_window_position(self):
+    def apply_window_geometry(self):
+        """Apply saved window position and size, or use defaults"""
         if self.settings_manager.get('remember_window_position', False):
-            position = self.settings_manager.get('window_position', {'x': 100, 'y': 100, 'screen_name': ''})
-            if position:
-                # Try to find the screen by name first
-                screen_name = position.get('screen_name', '')
-                target_screen = None
-                
-                if screen_name:
-                    from PyQt6.QtGui import QGuiApplication
-                    for screen in QGuiApplication.screens():
-                        if screen.name() == screen_name:
-                            target_screen = screen
-                            break
-                
-                # If screen found, move to that screen, otherwise use current screen
-                x = position.get('x', 100)
-                y = position.get('y', 100)
-                
-                # Ensure position is within screen bounds
-                if target_screen:
-                    geometry = target_screen.availableGeometry()
-                    x = max(geometry.x(), min(x, geometry.x() + geometry.width() - self.width()))
-                    y = max(geometry.y(), min(y, geometry.y() + geometry.height() - self.height()))
-                
-                self.move(x, y)
+            geometry = self.settings_manager.get('window_position', {
+                'x': 100, 'y': 100, 'width': 400, 'height': 950, 'screen_name': ''
+            })
+            
+            # Extract values
+            x = geometry.get('x', 100)
+            y = geometry.get('y', 100)
+            width = geometry.get('width', 400)
+            height = geometry.get('height', 950)
+            screen_name = geometry.get('screen_name', '')
+            
+            # Find target screen
+            target_screen = None
+            if screen_name:
+                for screen in QGuiApplication.screens():
+                    if screen.name() == screen_name:
+                        target_screen = screen
+                        break
+            
+            # Validate and constrain position/size to screen bounds
+            if target_screen:
+                screen_geometry = target_screen.availableGeometry()
+                x = max(screen_geometry.x(), min(x, screen_geometry.x() + screen_geometry.width() - width))
+                y = max(screen_geometry.y(), min(y, screen_geometry.y() + screen_geometry.height() - height))
+                width = min(width, screen_geometry.width())
+                height = min(height, screen_geometry.height())
+            
+            # Apply geometry
+            self.setGeometry(x, y, width, height)
+        else:
+            # Use default size and center on screen
+            self.resize(400, 950)
+            screen = QGuiApplication.primaryScreen()
+            if screen:
+                screen_geometry = screen.availableGeometry()
+                center_x = screen_geometry.x() + (screen_geometry.width() - 400) // 2
+                center_y = screen_geometry.y() + (screen_geometry.height() - 950) // 2
+                self.move(center_x, center_y)
 
-    def save_window_position(self):
+    def save_window_geometry(self):
+        """Save current window position and size"""
         if self.settings_manager.get('remember_window_position', False):
-            from PyQt6.QtGui import QGuiApplication
             pos = self.pos()
+            size = self.size()
             
             # Find which screen the window is currently on
             current_screen = QGuiApplication.screenAt(pos)
             screen_name = current_screen.name() if current_screen else ''
             
-            position_data = {
+            geometry_data = {
                 'x': pos.x(),
                 'y': pos.y(),
+                'width': size.width(),
+                'height': size.height(),
                 'screen_name': screen_name
             }
-            self.settings_manager.set('window_position', position_data)
+            self.settings_manager.set('window_position', geometry_data)
