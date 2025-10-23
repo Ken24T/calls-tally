@@ -1,7 +1,8 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-    QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QFormLayout, QSpinBox, QInputDialog, QSizePolicy, QApplication, QTabWidget, QMenuBar)  # Added QTabWidget, QMenuBar
-from PyQt6.QtGui import QAction, QTextCharFormat, QFont  # added QTextCharFormat, QFont
-from PyQt6.QtCore import QDate
+    QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QFormLayout, 
+    QSpinBox, QInputDialog, QSizePolicy, QApplication, QTabWidget, QMenuBar, QGroupBox)
+from PyQt6.QtGui import QAction, QTextCharFormat, QFont, QGuiApplication
+from PyQt6.QtCore import QDate, Qt
 from src.ui.report_dialog import ReportDialog
 from src.data.data_manager import DataManager
 from src.settings.settings_manager import SettingsManager
@@ -20,10 +21,10 @@ class MainWindow(QMainWindow):
         
         # Set up the main window
         self.setWindowTitle("Touch-Point Tracker")
-        self.setFixedSize(300, 860)  # Increased from 800 to 860 for better fit
+        self.setMinimumSize(400, 950)  # Minimum size for new layout
         
-        # Apply window position if remember setting is enabled
-        self.apply_window_position()
+        # Apply window geometry (position and size) if remember setting is enabled
+        self.apply_window_geometry()
         
         # Create central widget and layout
         
@@ -105,16 +106,8 @@ class MainWindow(QMainWindow):
         user_layout.addWidget(user_label)
         
         self.user_combo = QComboBox()
-        # Make user_combo expand horizontally but leave room for the add button
         self.user_combo.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         user_layout.addWidget(self.user_combo)
-        
-        # Add '+' button to the right of the user_combo
-        # self.add_user_button = QPushButton("+")
-        # self.add_user_button.setFixedWidth(40)
-        # self.add_user_button.setToolTip("Add new user")
-        # self.add_user_button.clicked.connect(self.add_user)
-        # user_layout.addWidget(self.add_user_button)
         
         # Date selection
         date_layout = QHBoxLayout()
@@ -127,103 +120,195 @@ class MainWindow(QMainWindow):
         self.date_edit = QDateEdit()
         self.date_edit.setDate(QDate.currentDate())
         self.date_edit.setCalendarPopup(True)
-        # Allow date_edit to resize horizontally
         self.date_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         date_layout.addWidget(self.date_edit)
-        # Store the currently loaded date as ISO string.
         self.current_date_str = self.date_edit.date().toString("yyyy-MM-dd")
         
-        # Counters tab widget
+        # Initialize widget dictionaries for tracking
+        self.current_leads_widgets = {}
+        self.prospects_widgets = {}
+        
+        # Initialize override tracking dictionaries
+        self.current_leads_overrides = {}
+        self.prospects_overrides = {}
+        
+        # Create tabs
         tab_widget = QTabWidget()
-        tab_widget.setMinimumHeight(480)  # Increased from 440 to 480
-        tab_widget.setMaximumHeight(480)
-        tab_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        # --- Helper for section creation ---
-        def add_section(layout, section_label, sources, suffix):
-            layout.addRow(QLabel(f"<b>{section_label}</b>"))
-            counters = {}
-            for idx, source in enumerate(sources):
-                field_name = f"{source.lower()}_{suffix}"
-                # Only show the source name, not the section label, in the spinner label
-                label = source.replace("courses.com.au", "Courses.com.au").replace("c-fox", "C-FOX").capitalize()
-                counter_layout = QHBoxLayout()
-                spin_box = QSpinBox()
-                spin_box.setMinimum(0)
-                spin_box.setMaximum(999)
-                spin_box.setMinimumHeight(31)
-                spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-                spin_box.setFixedWidth(70)
-                spin_box.valueChanged.connect(self.mark_dirty)
-                spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
-                counter_layout.addWidget(spin_box)
-                layout.addRow(label, counter_layout)
-                counters[field_name] = spin_box
-                # Insert bold 'Other' label after 'Agents Non-Connects' in Non-Connects section
-                if section_label == "Non-Connects" and source.lower() == "agents":
-                    layout.addRow(QLabel("<b>Other</b>"), QLabel(""))  # Bold 'Other' label
-            return counters
-        def add_misc_group(layout):
-            misc_counters = {}
-            for misc in ["SMS", "Email"]:
-                field_name = misc.lower()
-                spin_box = QSpinBox()
-                spin_box.setMinimum(0)
-                spin_box.setMaximum(999)
-                spin_box.setMinimumHeight(31)
-                spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-                spin_box.setFixedWidth(70)
-                spin_box.valueChanged.connect(self.mark_dirty)
-                spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
-                layout.addRow(misc, spin_box)
-                misc_counters[field_name] = spin_box
-            return misc_counters
-        sources = ["google", "c-fox", "courses.com.au", "organic", "agents"]
-        # --- Current Leads Tab ---
-        current_leads_widget = QWidget()
-        current_leads_layout = QFormLayout(current_leads_widget)
-        current_leads_layout.setSpacing(10)
-        current_leads_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
-        self.counters = {}
-        self.counters.update(add_section(current_leads_layout, "Connects", sources, "connects"))
-        self.counters.update(add_section(current_leads_layout, "Non-Connects", sources, "nonconnects"))
-        self.counters.update(add_misc_group(current_leads_layout))
-        tab_widget.addTab(current_leads_widget, "Current Leads")
-
-        # --- Prospects Tab ---
-        prospects_widget = QWidget()
-        prospects_layout = QFormLayout(prospects_widget)
-        prospects_layout.setSpacing(10)
-        prospects_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
-        self.prospects_counters = {}
-        self.prospects_counters.update(add_section(prospects_layout, "Connects", sources, "connects"))
-        self.prospects_counters.update(add_section(prospects_layout, "Non-Connects", sources, "nonconnects"))
-        self.prospects_counters.update(add_misc_group(prospects_layout))
-        tab_widget.addTab(prospects_widget, "Prospects")
-
+        tab_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        
+        # Create Current Leads tab
+        current_leads_tab = self._create_metrics_tab("current_leads")
+        tab_widget.addTab(current_leads_tab, "Current Leads")
+        
+        # Create Prospects tab  
+        prospects_tab = self._create_metrics_tab("prospects")
+        tab_widget.addTab(prospects_tab, "Prospects")
+        
         self.main_layout.addWidget(tab_widget)
-        # Remove the addStretch() call from here if it exists.
-        # For example, if there was a line like self.main_layout.addStretch() here, it should be removed.
-
-        # Modify existing spacer to be expanding, or ensure it is if previously changed.
-        # The key change is QSizePolicy.Policy.Expanding for the vertical policy.
-        # self.main_layout.addSpacerItem(QSpacerItem(0, 32, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
-
-        # Comments field
-        comments_label = QLabel("Comments:")
-        comments_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        # self.main_layout.addWidget(comments_label) # Commented out to hide the label
+        
+        # Comments/Notes field
         self.comments_edit = QTextEdit()
-        self.comments_edit.setFixedHeight(120)  # Increased from 50 to 120 for better space usage
+        self.comments_edit.setPlaceholderText("Notes...")
+        self.comments_edit.setMaximumHeight(100)
         self.comments_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        # Connect mark_dirty before autosave
         self.comments_edit.textChanged.connect(self.mark_dirty)
         self.comments_edit.textChanged.connect(self.autosave)
         self.main_layout.addWidget(self.comments_edit)
-
-        # Ensure no other addStretch() is at the very end of this method if it interferes.
-        # If an addStretch() was at the end of create_form() to push buttons down,
-        # it might need to be re-evaluated or removed if the expanding spacer handles all slack.
-        # Given the buttons are added after create_form in __init__, this might not be an issue here.
+    
+    def _create_metrics_tab(self, tab_name):
+        """Create a metrics tab with the new structure"""
+        tab_widget = QWidget()
+        tab_layout = QVBoxLayout(tab_widget)
+        tab_layout.setSpacing(10)
+        tab_layout.setContentsMargins(10, 10, 10, 10)
+        
+        # Determine which widget dictionary to use
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        
+        # CALL - Connects Section
+        connects_group = self._create_call_section("CALL - Connects", "call_connects", tab_name, widgets_dict, overrides_dict)
+        tab_layout.addWidget(connects_group)
+        
+        # CALL - Non-Connects Section
+        nonconnects_group = self._create_call_section("CALL - Non-Connects", "call_nonconnects", tab_name, widgets_dict, overrides_dict)
+        tab_layout.addWidget(nonconnects_group)
+        
+        # CALL - In Betweens Section
+        inbetweens_group = self._create_call_section("CALL - In Betweens", "call_inbetweens", tab_name, widgets_dict, overrides_dict)
+        tab_layout.addWidget(inbetweens_group)
+        
+        # OTHER Section
+        other_group = self._create_other_section(tab_name, widgets_dict, overrides_dict)
+        tab_layout.addWidget(other_group)
+        
+        # GRAND TOTAL
+        grand_total_layout = QHBoxLayout()
+        grand_total_label = QLabel("<b>GRAND TOTAL:</b>")
+        grand_total_layout.addWidget(grand_total_label)
+        grand_total_layout.addStretch()
+        
+        grand_total_spinbox = QSpinBox()
+        grand_total_spinbox.setMinimum(0)
+        grand_total_spinbox.setMaximum(99999)
+        grand_total_spinbox.setFixedWidth(100)
+        grand_total_spinbox.setObjectName("grand-total")
+        grand_total_spinbox.valueChanged.connect(lambda: self._on_total_manually_changed("grand_total", tab_name))
+        widgets_dict["grand_total"] = grand_total_spinbox
+        overrides_dict["grand_total"] = False
+        grand_total_layout.addWidget(grand_total_spinbox)
+        
+        tab_layout.addLayout(grand_total_layout)
+        
+        # Additional Metrics Section
+        additional_group = QGroupBox("Additional Metrics")
+        additional_layout = QFormLayout()
+        additional_layout.setSpacing(8)
+        
+        for metric_name, display_name in [
+            ("enrolment_packs", "Enrolment Packs"),
+            ("quotes", "Quotes"),
+            ("cpd_booked", "CPD Booked")
+        ]:
+            spinbox = QSpinBox()
+            spinbox.setMinimum(0)
+            spinbox.setMaximum(999)
+            spinbox.setFixedWidth(100)
+            spinbox.valueChanged.connect(lambda val, mn=metric_name, tn=tab_name: self._on_additional_metric_changed(mn, tn))
+            additional_layout.addRow(display_name + ":", spinbox)
+            widgets_dict[metric_name] = spinbox
+        
+        additional_group.setLayout(additional_layout)
+        tab_layout.addWidget(additional_group)
+        
+        # GRAND TOTAL 2
+        grand_total_2_layout = QHBoxLayout()
+        grand_total_2_label = QLabel("<b>GRAND TOTAL:</b>")
+        grand_total_2_layout.addWidget(grand_total_2_label)
+        grand_total_2_layout.addStretch()
+        
+        grand_total_2_spinbox = QSpinBox()
+        grand_total_2_spinbox.setMinimum(0)
+        grand_total_2_spinbox.setMaximum(99999)
+        grand_total_2_spinbox.setFixedWidth(100)
+        grand_total_2_spinbox.setObjectName("grand-total")
+        grand_total_2_spinbox.valueChanged.connect(lambda: self._on_total_manually_changed("grand_total_2", tab_name))
+        widgets_dict["grand_total_2"] = grand_total_2_spinbox
+        overrides_dict["grand_total_2"] = False
+        grand_total_2_layout.addWidget(grand_total_2_spinbox)
+        
+        tab_layout.addLayout(grand_total_2_layout)
+        tab_layout.addStretch()
+        
+        return tab_widget
+    
+    def _create_call_section(self, title, section_key, tab_name, widgets_dict, overrides_dict):
+        """Create a CALL section (Connects, Non-Connects, or In Betweens)"""
+        group = QGroupBox(title)
+        layout = QFormLayout()
+        layout.setSpacing(8)
+        
+        # Create nested dictionary for this section
+        widgets_dict[section_key] = {}
+        overrides_dict[section_key] = False
+        
+        # Add input fields
+        for field_name, display_name in [
+            ("paid_lead", "Paid Lead"),
+            ("organic_lead", "Organic Lead"),
+            ("agents", "Agents")
+        ]:
+            spinbox = QSpinBox()
+            spinbox.setMinimum(0)
+            spinbox.setMaximum(999)
+            spinbox.setFixedWidth(100)
+            spinbox.valueChanged.connect(lambda val, sk=section_key, tn=tab_name: self._on_section_value_changed(sk, tn))
+            layout.addRow(display_name + ":", spinbox)
+            widgets_dict[section_key][field_name] = spinbox
+        
+        # Add Total field (editable)
+        total_spinbox = QSpinBox()
+        total_spinbox.setMinimum(0)
+        total_spinbox.setMaximum(9999)
+        total_spinbox.setFixedWidth(100)
+        total_spinbox.setObjectName("total-field")
+        total_spinbox.valueChanged.connect(lambda: self._on_section_total_manually_changed(section_key, tab_name))
+        layout.addRow("<b>Total:</b>", total_spinbox)
+        widgets_dict[section_key]["total"] = total_spinbox
+        
+        group.setLayout(layout)
+        return group
+    
+    def _create_other_section(self, tab_name, widgets_dict, overrides_dict):
+        """Create the OTHER section (SMS, Email)"""
+        group = QGroupBox("OTHER")
+        layout = QFormLayout()
+        layout.setSpacing(8)
+        
+        widgets_dict["other"] = {}
+        overrides_dict["other"] = False
+        
+        for field_name, display_name in [("sms", "SMS"), ("email", "Email")]:
+            spinbox = QSpinBox()
+            spinbox.setMinimum(0)
+            spinbox.setMaximum(999)
+            spinbox.setFixedWidth(100)
+            spinbox.valueChanged.connect(lambda val, tn=tab_name: self._on_other_value_changed(tn))
+            layout.addRow(display_name + ":", spinbox)
+            widgets_dict["other"][field_name] = spinbox
+        
+        # Add Total field
+        total_spinbox = QSpinBox()
+        total_spinbox.setMinimum(0)
+        total_spinbox.setMaximum(9999)
+        total_spinbox.setFixedWidth(100)
+        total_spinbox.setObjectName("total-field")
+        total_spinbox.valueChanged.connect(lambda: self._on_other_total_manually_changed(tab_name))
+        layout.addRow("<b>Total:</b>", total_spinbox)
+        widgets_dict["other"]["total"] = total_spinbox
+        
+        group.setLayout(layout)
+        return group
     
     def update_user_dropdown(self):
         # Get users and update combo box
