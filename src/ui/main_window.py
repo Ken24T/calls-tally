@@ -533,69 +533,186 @@ class MainWindow(QMainWindow):
             self.update_calendar_styles()
     
     def save_data(self, date_str_override=None):
+        """Save entry data with new schema"""
         # Validate form
         if self.user_combo.currentText() == "":
             QMessageBox.warning(self, "Error", "Please select a caller")
             return
+        
         if date_str_override is not None:
             date_str = date_str_override
         else:
             date_str = self.date_edit.date().toString("yyyy-MM-dd")
-        # Separate out misc fields
-        current_leads_data = {k: v.value() for k, v in self.counters.items() if k not in ["sms", "email"]}
-        current_leads_misc = {k: v.value() for k, v in self.counters.items() if k in ["sms", "email"]}
-        prospects_data = {k: v.value() for k, v in self.prospects_counters.items() if k not in ["sms", "email"]}
-        prospects_misc = {k: v.value() for k, v in self.prospects_counters.items() if k in ["sms", "email"]}
+        
+        # Extract data from both tabs
+        current_leads_data = self._extract_tab_data(self.current_leads_widgets)
+        prospects_data = self._extract_tab_data(self.prospects_widgets)
+        
         entry_data = {
             "user": self.user_combo.currentText(),
             "date": date_str,
-            "comments": self.comments_edit.toPlainText(),
-            "current_leads": {**current_leads_data, **current_leads_misc},
-            "prospects": {**prospects_data, **prospects_misc}
+            "current_leads": current_leads_data,
+            "prospects": prospects_data,
+            "comments": self.comments_edit.toPlainText()
         }
+        
         self.data_manager.save_entry(entry_data)
         self.dirty = False
+    
+    def _extract_tab_data(self, widgets_dict):
+        """Extract data from widget dictionary into save format"""
+        data = {}
+        
+        # Extract CALL sections
+        for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+            data[section_key] = {
+                "paid_lead": widgets_dict[section_key]["paid_lead"].value(),
+                "organic_lead": widgets_dict[section_key]["organic_lead"].value(),
+                "agents": widgets_dict[section_key]["agents"].value(),
+                "total": widgets_dict[section_key]["total"].value()
+            }
+        
+        # Extract OTHER section
+        data["other"] = {
+            "sms": widgets_dict["other"]["sms"].value(),
+            "email": widgets_dict["other"]["email"].value(),
+            "total": widgets_dict["other"]["total"].value()
+        }
+        
+        # Extract standalone fields
+        data["grand_total"] = widgets_dict["grand_total"].value()
+        data["enrolment_packs"] = widgets_dict["enrolment_packs"].value()
+        data["quotes"] = widgets_dict["quotes"].value()
+        data["cpd_booked"] = widgets_dict["cpd_booked"].value()
+        data["grand_total_2"] = widgets_dict["grand_total_2"].value()
+        
+        return data
 
     def load_user_entry(self):
-        """Load existing call statistics for the selected user and date into the UI."""
+        """Load existing entry data for the selected user and date into the UI."""
         self.current_date_str = self.date_edit.date().toString("yyyy-MM-dd")
         user = self.user_combo.currentText()
         if not user:
             return
+        
         date_str = self.date_edit.date().toString("yyyy-MM-dd")
         entry = self.data_manager.get_entry_for_user_and_date(user, date_str)
-        self.comments_edit.blockSignals(True)
-        for spin_box in self.counters.values():
-            spin_box.blockSignals(True)
-        for spin_box in self.prospects_counters.values():
-            spin_box.blockSignals(True)
+        
+        # Block all signals during load
+        self._block_all_signals(True)
+        
         if entry:
-            if "current_leads" in entry:
-                for key, spin_box in self.counters.items():
-                    spin_box.setValue(entry["current_leads"].get(key, 0))
-            else:
-                for key, spin_box in self.counters.items():
-                    spin_box.setValue(entry.get(key, 0))
-            if "prospects" in entry:
-                for key, spin_box in self.prospects_counters.items():
-                    spin_box.setValue(entry["prospects"].get(key, 0))
-            else:
-                for spin_box in self.prospects_counters.values():
-                    spin_box.setValue(0)
+            # Load current leads data
+            self._populate_tab_widgets(self.current_leads_widgets, entry.get("current_leads", {}))
+            # Load prospects data
+            self._populate_tab_widgets(self.prospects_widgets, entry.get("prospects", {}))
+            # Load comments
             self.comments_edit.setText(entry.get("comments", ""))
         else:
-            for spin_box in self.counters.values():
-                spin_box.setValue(0)
-            for spin_box in self.prospects_counters.values():
-                spin_box.setValue(0)
-            self.comments_edit.clear()
-        for spin_box in self.counters.values():
-            spin_box.blockSignals(False)
-        for spin_box in self.prospects_counters.values():
-            spin_box.blockSignals(False)
-        self.comments_edit.blockSignals(False)
+            # Clear all to zeros
+            self._clear_all_widgets()
+        
+        # Unblock signals
+        self._block_all_signals(False)
+        
+        # Reset override flags (data loaded from file is not considered overridden)
+        self._reset_all_overrides()
+        
+        # Recalculate all totals to ensure consistency
+        self._recalculate_all_totals()
+        
         self.update_calendar_styles()
         self.dirty = False
+    
+    def _populate_tab_widgets(self, widgets_dict, data):
+        """Populate widgets from loaded data"""
+        # Populate CALL sections
+        for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+            section_data = data.get(section_key, {})
+            for field in ["paid_lead", "organic_lead", "agents", "total"]:
+                value = section_data.get(field, 0)
+                widgets_dict[section_key][field].setValue(value)
+        
+        # Populate OTHER section
+        other_data = data.get("other", {})
+        for field in ["sms", "email", "total"]:
+            value = other_data.get(field, 0)
+            widgets_dict["other"][field].setValue(value)
+        
+        # Populate standalone fields
+        widgets_dict["grand_total"].setValue(data.get("grand_total", 0))
+        widgets_dict["enrolment_packs"].setValue(data.get("enrolment_packs", 0))
+        widgets_dict["quotes"].setValue(data.get("quotes", 0))
+        widgets_dict["cpd_booked"].setValue(data.get("cpd_booked", 0))
+        widgets_dict["grand_total_2"].setValue(data.get("grand_total_2", 0))
+    
+    def _clear_all_widgets(self):
+        """Clear all widgets to zero"""
+        for widgets_dict in [self.current_leads_widgets, self.prospects_widgets]:
+            # Clear CALL sections
+            for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+                for field in ["paid_lead", "organic_lead", "agents", "total"]:
+                    widgets_dict[section_key][field].setValue(0)
+            
+            # Clear OTHER section
+            for field in ["sms", "email", "total"]:
+                widgets_dict["other"][field].setValue(0)
+            
+            # Clear standalone fields
+            widgets_dict["grand_total"].setValue(0)
+            widgets_dict["enrolment_packs"].setValue(0)
+            widgets_dict["quotes"].setValue(0)
+            widgets_dict["cpd_booked"].setValue(0)
+            widgets_dict["grand_total_2"].setValue(0)
+        
+        self.comments_edit.clear()
+    
+    def _block_all_signals(self, block):
+        """Block or unblock signals for all widgets"""
+        for widgets_dict in [self.current_leads_widgets, self.prospects_widgets]:
+            # Block CALL sections
+            for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+                for widget in widgets_dict[section_key].values():
+                    widget.blockSignals(block)
+            
+            # Block OTHER section
+            for widget in widgets_dict["other"].values():
+                widget.blockSignals(block)
+            
+            # Block standalone fields
+            widgets_dict["grand_total"].blockSignals(block)
+            widgets_dict["enrolment_packs"].blockSignals(block)
+            widgets_dict["quotes"].blockSignals(block)
+            widgets_dict["cpd_booked"].blockSignals(block)
+            widgets_dict["grand_total_2"].blockSignals(block)
+        
+        self.comments_edit.blockSignals(block)
+    
+    def _reset_all_overrides(self):
+        """Reset all override flags and styling"""
+        for tab_name in ["current_leads", "prospects"]:
+            widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+            overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+            
+            # Reset section overrides
+            for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+                overrides_dict[section_key] = False
+                widgets_dict[section_key]["total"].setStyleSheet("")
+                widgets_dict[section_key]["total"].setToolTip("")
+            
+            # Reset other override
+            overrides_dict["other"] = False
+            widgets_dict["other"]["total"].setStyleSheet("")
+            widgets_dict["other"]["total"].setToolTip("")
+            
+            # Reset grand total overrides
+            overrides_dict["grand_total"] = False
+            widgets_dict["grand_total"].setStyleSheet("")
+            widgets_dict["grand_total"].setToolTip("")
+            
+            overrides_dict["grand_total_2"] = False
+            widgets_dict["grand_total_2"].setStyleSheet("")
+            widgets_dict["grand_total_2"].setToolTip("")
     
     def show_report_dialog(self):
         user = self.user_combo.currentText()
