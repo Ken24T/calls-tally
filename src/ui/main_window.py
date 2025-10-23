@@ -310,6 +310,161 @@ class MainWindow(QMainWindow):
         group.setLayout(layout)
         return group
     
+    # ============================================================================
+    # Calculation Methods
+    # ============================================================================
+    
+    def _on_section_value_changed(self, section_key, tab_name):
+        """Called when paid_lead, organic_lead, or agents changes in a CALL section"""
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        
+        # Only recalculate if not manually overridden
+        if not overrides_dict.get(section_key, False):
+            total = self._calculate_section_total(widgets_dict[section_key])
+            widgets_dict[section_key]["total"].blockSignals(True)
+            widgets_dict[section_key]["total"].setValue(total)
+            widgets_dict[section_key]["total"].setStyleSheet("")  # Clear override styling
+            widgets_dict[section_key]["total"].blockSignals(False)
+        
+        # Recalculate grand total
+        self._recalculate_grand_total(tab_name)
+        self.mark_dirty()
+        self.autosave()
+    
+    def _on_section_total_manually_changed(self, section_key, tab_name):
+        """Called when user manually edits a section total"""
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        
+        # Mark as overridden
+        overrides_dict[section_key] = True
+        # Apply visual indicator
+        widgets_dict[section_key]["total"].setStyleSheet("background-color: #FFFACD;")
+        widgets_dict[section_key]["total"].setToolTip("Manually overridden. Change component values to reset.")
+        
+        # Recalculate grand total
+        self._recalculate_grand_total(tab_name)
+        self.mark_dirty()
+        self.autosave()
+    
+    def _on_other_value_changed(self, tab_name):
+        """Called when SMS or Email changes in OTHER section"""
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        
+        # Only recalculate if not manually overridden
+        if not overrides_dict.get("other", False):
+            total = widgets_dict["other"]["sms"].value() + widgets_dict["other"]["email"].value()
+            widgets_dict["other"]["total"].blockSignals(True)
+            widgets_dict["other"]["total"].setValue(total)
+            widgets_dict["other"]["total"].setStyleSheet("")
+            widgets_dict["other"]["total"].blockSignals(False)
+        
+        # Recalculate grand total
+        self._recalculate_grand_total(tab_name)
+        self.mark_dirty()
+        self.autosave()
+    
+    def _on_other_total_manually_changed(self, tab_name):
+        """Called when user manually edits OTHER total"""
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        
+        overrides_dict["other"] = True
+        widgets_dict["other"]["total"].setStyleSheet("background-color: #FFFACD;")
+        widgets_dict["other"]["total"].setToolTip("Manually overridden. Change SMS/Email to reset.")
+        
+        self._recalculate_grand_total(tab_name)
+        self.mark_dirty()
+        self.autosave()
+    
+    def _on_additional_metric_changed(self, metric_name, tab_name):
+        """Called when enrolment_packs, quotes, or cpd_booked changes"""
+        self._recalculate_grand_total_2(tab_name)
+        self.mark_dirty()
+        self.autosave()
+    
+    def _on_total_manually_changed(self, total_type, tab_name):
+        """Called when user manually edits grand_total or grand_total_2"""
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        
+        overrides_dict[total_type] = True
+        widgets_dict[total_type].setStyleSheet("background-color: #FFFACD;")
+        widgets_dict[total_type].setToolTip("Manually overridden. Change component values to reset.")
+        
+        self.mark_dirty()
+        self.autosave()
+    
+    def _calculate_section_total(self, section_widgets):
+        """Calculate total for a CALL section"""
+        return (section_widgets["paid_lead"].value() + 
+                section_widgets["organic_lead"].value() + 
+                section_widgets["agents"].value())
+    
+    def _recalculate_grand_total(self, tab_name):
+        """Recalculate GRAND TOTAL (sum of all CALL sections + OTHER)"""
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        
+        # Only recalculate if not manually overridden
+        if not overrides_dict.get("grand_total", False):
+            total = (widgets_dict["call_connects"]["total"].value() +
+                    widgets_dict["call_nonconnects"]["total"].value() +
+                    widgets_dict["call_inbetweens"]["total"].value() +
+                    widgets_dict["other"]["total"].value())
+            
+            widgets_dict["grand_total"].blockSignals(True)
+            widgets_dict["grand_total"].setValue(total)
+            widgets_dict["grand_total"].setStyleSheet("")
+            widgets_dict["grand_total"].blockSignals(False)
+    
+    def _recalculate_grand_total_2(self, tab_name):
+        """Recalculate GRAND TOTAL 2 (sum of additional metrics)"""
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        
+        # Only recalculate if not manually overridden
+        if not overrides_dict.get("grand_total_2", False):
+            total = (widgets_dict["enrolment_packs"].value() +
+                    widgets_dict["quotes"].value() +
+                    widgets_dict["cpd_booked"].value())
+            
+            widgets_dict["grand_total_2"].blockSignals(True)
+            widgets_dict["grand_total_2"].setValue(total)
+            widgets_dict["grand_total_2"].setStyleSheet("")
+            widgets_dict["grand_total_2"].blockSignals(False)
+    
+    def _recalculate_all_totals(self):
+        """Recalculate all totals for both tabs"""
+        for tab_name in ["current_leads", "prospects"]:
+            widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+            overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+            
+            # Recalculate section totals
+            for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+                if not overrides_dict.get(section_key, False):
+                    total = self._calculate_section_total(widgets_dict[section_key])
+                    widgets_dict[section_key]["total"].blockSignals(True)
+                    widgets_dict[section_key]["total"].setValue(total)
+                    widgets_dict[section_key]["total"].blockSignals(False)
+            
+            # Recalculate other total
+            if not overrides_dict.get("other", False):
+                total = widgets_dict["other"]["sms"].value() + widgets_dict["other"]["email"].value()
+                widgets_dict["other"]["total"].blockSignals(True)
+                widgets_dict["other"]["total"].setValue(total)
+                widgets_dict["other"]["total"].blockSignals(False)
+            
+            # Recalculate grand totals
+            self._recalculate_grand_total(tab_name)
+            self._recalculate_grand_total_2(tab_name)
+    
+    # ============================================================================
+    # Existing Methods (to be updated)
+    # ============================================================================
+    
     def update_user_dropdown(self):
         # Get users and update combo box
         self.user_combo.blockSignals(True)
