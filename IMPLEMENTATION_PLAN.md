@@ -96,12 +96,22 @@ This document outlines the complete implementation plan for restructuring the To
 ### **PHASE 2: Main Window UI Restructuring**
 **File**: `src/ui/main_window.py`
 
+**Additional File**: `src/settings/settings_manager.py` (for window size persistence)
+
 #### Tasks:
 
 ##### 2.1 Window Configuration
 - Change from `setFixedSize(300, 860)` to `setMinimumSize(350, 900)`
 - Allow window to be resizable
 - Adjust layout policies for proper resizing behavior
+- **Window Position & Size Persistence**:
+  - If `remember_window_position` setting is True:
+    - Restore both position AND size from settings on startup
+    - Save both position AND size on window close
+  - If `remember_window_position` setting is False:
+    - Use default position and default size on startup
+    - Default size: 350x900 (or suitable starting size)
+    - Default position: Center of screen or (100, 100)
 
 ##### 2.2 Create New UI Components
 Replace `create_form()` method with new structure:
@@ -220,12 +230,118 @@ self.prospects_widgets = {
 - Recalculate from components
 - Reset visual indicator
 
-##### 2.6 Visual Indicators for Overrides
+##### 2.8 Visual Indicators for Overrides
 - **Normal calculated**: Default background color
 - **User overridden**: Light yellow background (#FFFACD)
 - **Tooltip**: "Manually overridden. Right-click to reset to calculated value"
 
----
+##### 2.9 Window Size & Position Persistence
+
+**Update SettingsManager (`settings_manager.py`)**:
+```python
+self.default_settings = {
+    'remember_window_position': False,
+    'window_position': {
+        'x': 100, 
+        'y': 100, 
+        'width': 350,    # Add width
+        'height': 900,   # Add height
+        'screen_name': ''
+    },
+    'default_emails': ''
+}
+```
+
+**Update MainWindow methods**:
+
+1. **`apply_window_position()` → `apply_window_geometry()`**:
+```python
+def apply_window_geometry(self):
+    """Apply saved window position and size, or use defaults"""
+    if self.settings_manager.get('remember_window_position', False):
+        geometry = self.settings_manager.get('window_position', {
+            'x': 100, 'y': 100, 'width': 350, 'height': 900, 'screen_name': ''
+        })
+        
+        # Extract values
+        x = geometry.get('x', 100)
+        y = geometry.get('y', 100)
+        width = geometry.get('width', 350)
+        height = geometry.get('height', 900)
+        screen_name = geometry.get('screen_name', '')
+        
+        # Find target screen
+        target_screen = None
+        if screen_name:
+            from PyQt6.QtGui import QGuiApplication
+            for screen in QGuiApplication.screens():
+                if screen.name() == screen_name:
+                    target_screen = screen
+                    break
+        
+        # Validate and constrain position/size to screen bounds
+        if target_screen:
+            screen_geometry = target_screen.availableGeometry()
+            x = max(screen_geometry.x(), min(x, screen_geometry.x() + screen_geometry.width() - width))
+            y = max(screen_geometry.y(), min(y, screen_geometry.y() + screen_geometry.height() - height))
+            width = min(width, screen_geometry.width())
+            height = min(height, screen_geometry.height())
+        
+        # Apply geometry
+        self.setGeometry(x, y, width, height)
+    else:
+        # Use default size and center on screen (or fixed position)
+        self.resize(350, 900)
+        # Option 1: Center on screen
+        from PyQt6.QtGui import QGuiApplication
+        screen = QGuiApplication.primaryScreen()
+        if screen:
+            screen_geometry = screen.availableGeometry()
+            center_x = screen_geometry.x() + (screen_geometry.width() - 350) // 2
+            center_y = screen_geometry.y() + (screen_geometry.height() - 900) // 2
+            self.move(center_x, center_y)
+        # Option 2: Fixed default position
+        # self.move(100, 100)
+```
+
+2. **`save_window_position()` → `save_window_geometry()`**:
+```python
+def save_window_geometry(self):
+    """Save current window position and size"""
+    if self.settings_manager.get('remember_window_position', False):
+        from PyQt6.QtGui import QGuiApplication
+        pos = self.pos()
+        size = self.size()
+        
+        # Find which screen the window is currently on
+        current_screen = QGuiApplication.screenAt(pos)
+        screen_name = current_screen.name() if current_screen else ''
+        
+        geometry_data = {
+            'x': pos.x(),
+            'y': pos.y(),
+            'width': size.width(),
+            'height': size.height(),
+            'screen_name': screen_name
+        }
+        self.settings_manager.set('window_position', geometry_data)
+```
+
+3. **Update calls in `__init__()` and `closeEvent()`**:
+```python
+# In __init__, after creating window:
+self.apply_window_geometry()  # Changed from apply_window_position()
+
+# In closeEvent():
+self.save_window_geometry()  # Changed from save_window_position()
+```
+
+**Update Settings Dialog UI**:
+- Setting label: "Remember window position and size"
+- Tooltip: "When enabled, the application will restore its position and size from the last session"
+- JSON setting name: `remember_window_position` (keep same name for backward compatibility)
+
+
 
 ### **PHASE 3: Load/Save Logic**
 **File**: `src/ui/main_window.py`
@@ -488,6 +604,15 @@ QSpinBox[isGrandTotal="true"] {
 - [ ] Test email report functionality
 - [ ] Test notes section in reports
 - [ ] Test window resizing behavior
+- [ ] Test window position & size persistence:
+  - [ ] Enable "Remember window position" setting
+  - [ ] Resize and move window
+  - [ ] Close and reopen app - verify position and size restored
+  - [ ] Disable "Remember window position" setting
+  - [ ] Close and reopen app - verify default size and position used
+  - [ ] Test across multiple monitors if available
+  - [ ] Verify setting accessible from Settings UI
+  - [ ] Verify setting accessible from app_settings.json file
 - [ ] Test autosave functionality
 - [ ] Test with empty/missing data
 
@@ -504,7 +629,9 @@ QSpinBox[isGrandTotal="true"] {
 1. Create new widget layout for one tab
 2. Implement widget tracking dictionaries
 3. Copy structure to second tab
-4. Update window sizing
+4. Update window sizing and resizability
+5. Implement window size & position persistence (update settings manager)
+6. Test window geometry save/restore
 
 ### Step 3: Calculation Logic (2-3 hours)
 1. Implement section total calculations
@@ -548,6 +675,9 @@ QSpinBox[isGrandTotal="true"] {
 ✅ Users can override any total
 ✅ Visual indicators show overridden values
 ✅ Window is resizable
+✅ Window size and position persist when setting enabled
+✅ Default size and position used when setting disabled
+✅ Setting accessible from both UI and JSON file
 ✅ Reports display new structure correctly
 ✅ Autosave works with new schema
 ✅ Notes feature still works
@@ -561,6 +691,9 @@ QSpinBox[isGrandTotal="true"] {
 - **Fresh Start**: No migration from old data needed
 - **Override Detection**: Track which totals are manually set vs auto-calculated
 - **Performance**: Recalculation on every change - should be fast with simple arithmetic
+- **Window Persistence**: Save/restore both position AND size when setting enabled
+- **Settings Access**: Window geometry setting available via UI (Settings dialog) and JSON file (data/app_settings.json)
+- **Default Behavior**: When "remember position" is disabled, use default size (350x900) and center on primary screen
 - **Future Enhancement**: Consider "reset all overrides" button
 - **Validation**: Ensure totals make logical sense (warning if manual total < sum of components)
 
