@@ -46,6 +46,169 @@
         "sms": 3,
         "email": 4
       }
+    },
+    {
+      "user": "Ken",
+      "date": "2025-10-23",
+      "comments": "1 google connect and 1 C-fox connect",
+      "current_leads": {
+        "call_connects": {
+          "paid_lead": 5,
+          "organic_lead": 1,
+          "agents": 0,
+          "total": 6
+        },
+        "call_nonconnects": {
+          "paid_lead": 13,
+          "organic_lead": 5,
+          "agents": 0,
+          "total": 18
+        },
+        "call_inbetweens": {
+          "paid_lead": 0,
+          "organic_lead": 3,
+          "agents": 0,
+          "total": 3
+        },
+        "other": {
+          "sms": 11,
+          "email": 6,
+          "total": 17
+        },
+        "grand_total": 44,
+        "enrolment_packs": 3,
+        "quotes": 0,
+        "cpd_booked": 1,
+        "grand_total_2": 4
+      },
+      "prospects": {
+        "call_connects": {
+          "paid_lead": 1,
+          "organic_lead": 0,
+          "agents": 0,
+          "total": 1
+        },
+        "call_nonconnects": {
+          "paid_lead": 0,
+          "organic_lead": 0,
+          "agents": 0,
+          "total": 0
+        },
+        "call_inbetweens": {
+          "paid_lead": 0,
+          "organic_lead": 0,
+          "agents": 0,
+          "total": 0
+        },
+        "other": {
+          "sms": 1,
+          "email": 4,
+          "total": 5
+        },
+        "grand_total": 6,
+        "enrolment_packs": 0,
+        "quotes": 0,
+        "cpd_booked": 0,
+        "grand_total_2": 0
+      }
+    },
+    {
+      "user": "Ken",
+      "date": "2025-10-22",
+      "comments": "1 organic connect, 1 agent connect.",
+      "current_leads": {
+        "google_connects": 0,
+        "c-fox_connects": 0,
+        "courses.com.au_connects": 0,
+        "organic_connects": 0,
+        "agents_connects": 1,
+        "google_nonconnects": 0,
+        "c-fox_nonconnects": 0,
+        "courses.com.au_nonconnects": 0,
+        "organic_nonconnects": 0,
+        "agents_nonconnects": 0,
+        "sms": 0,
+        "email": 0
+      },
+      "prospects": {
+        "google_connects": 0,
+        "c-fox_connects": 0,
+        "courses.com.au_connects": 0,
+        "organic_connects": 1,
+        "agents_connects": 0,
+        "google_nonconnects": 0,
+        "c-fox_nonconnects": 0,
+        "courses.com.au_nonconnects": 0,
+        "organic_nonconnects": 0,
+        "agents_nonconnects": 0,
+        "sms": 0,
+        "email": 0
+      }
+    },
+    {
+      "user": "Ken",
+      "date": "2025-10-21",
+      "current_leads": {
+        "call_connects": {
+          "paid_lead": 0,
+          "organic_lead": 0,
+          "agents": 0,
+          "total": 0
+        },
+        "call_nonconnects": {
+          "paid_lead": 0,
+          "organic_lead": 0,
+          "agents": 0,
+          "total": 0
+        },
+        "call_inbetweens": {
+          "paid_lead": 0,
+          "organic_lead": 0,
+          "agents": 0,
+          "total": 0
+        },
+        "other": {
+          "sms": 0,
+          "email": 0,
+          "total": 0
+        },
+        "grand_total": 0,
+        "enrolment_packs": 0,
+        "quotes": 0,
+        "cpd_booked": 0,
+        "grand_total_2": 0
+      },
+      "prospects": {
+        "call_connects": {
+          "paid_lead": 1,
+          "organic_lead": 5,
+          "agents": 1,
+          "total": 7
+        },
+        "call_nonconnects": {
+          "paid_lead": 2,
+          "organic_lead": 2,
+          "agents": 3,
+          "total": 7
+        },
+        "call_inbetweens": {
+          "paid_lead": 3,
+          "organic_lead": 2,
+          "agents": 5,
+          "total": 10
+        },
+        "other": {
+          "sms": 3,
+          "email": 3,
+          "total": 6
+        },
+        "grand_total": 30,
+        "enrolment_packs": 3,
+        "quotes": 2,
+        "cpd_booked": 6,
+        "grand_total_2": 11
+      },
+      "comments": "Testing only...."
     }
   ]
 }

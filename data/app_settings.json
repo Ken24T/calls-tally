@@ -1,9 +1,11 @@
 {
-  "remember_window_position": true,
+  "remember_window_position": false,
   "window_position": {
-    "x": 4286,
-    "y": 420,
-    "screen_name": "24G2W1G4"
+    "x": 100,
+    "y": 100,
+    "width": 320,
+    "height": 1024,
+    "screen_name": ""
   },
-  "default_emails": "ken@disher.com.au"
+  "default_emails": ""
 }

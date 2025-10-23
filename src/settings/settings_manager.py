@@ -6,7 +6,7 @@ class SettingsManager:
         self.settings_file = settings_file
         self.default_settings = {
             'remember_window_position': False,
-            'window_position': {'x': 100, 'y': 100, 'screen_name': ''},
+            'window_position': {'x': 100, 'y': 100, 'width': 320, 'height': 1024, 'screen_name': ''},
             'default_emails': ''  # Only default_emails is needed now
         }
         self.settings = self.load_settings()

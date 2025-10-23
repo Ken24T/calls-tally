@@ -1,7 +1,8 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-    QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QFormLayout, QSpinBox, QInputDialog, QSizePolicy, QApplication, QTabWidget, QMenuBar)  # Added QTabWidget, QMenuBar
-from PyQt6.QtGui import QAction, QTextCharFormat, QFont  # added QTextCharFormat, QFont
-from PyQt6.QtCore import QDate
+    QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox, QFormLayout, 
+    QSpinBox, QInputDialog, QSizePolicy, QApplication, QTabWidget, QMenuBar, QGroupBox, QScrollArea)
+from PyQt6.QtGui import QAction, QTextCharFormat, QFont, QGuiApplication
+from PyQt6.QtCore import QDate, Qt
 from src.ui.report_dialog import ReportDialog
 from src.data.data_manager import DataManager
 from src.settings.settings_manager import SettingsManager
@@ -20,10 +21,11 @@ class MainWindow(QMainWindow):
         
         # Set up the main window
         self.setWindowTitle("Touch-Point Tracker")
-        self.setFixedSize(300, 860)  # Increased from 800 to 860 for better fit
+        self.setMinimumSize(320, 1024)
         
-        # Apply window position if remember setting is enabled
-        self.apply_window_position()
+        # Apply window geometry (position and size) if remember setting is enabled
+        # This will either restore saved geometry or apply default size/position
+        self.apply_window_geometry()
         
         # Create central widget and layout
         
@@ -105,16 +107,8 @@ class MainWindow(QMainWindow):
         user_layout.addWidget(user_label)
         
         self.user_combo = QComboBox()
-        # Make user_combo expand horizontally but leave room for the add button
         self.user_combo.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         user_layout.addWidget(self.user_combo)
-        
-        # Add '+' button to the right of the user_combo
-        # self.add_user_button = QPushButton("+")
-        # self.add_user_button.setFixedWidth(40)
-        # self.add_user_button.setToolTip("Add new user")
-        # self.add_user_button.clicked.connect(self.add_user)
-        # user_layout.addWidget(self.add_user_button)
         
         # Date selection
         date_layout = QHBoxLayout()
@@ -127,103 +121,486 @@ class MainWindow(QMainWindow):
         self.date_edit = QDateEdit()
         self.date_edit.setDate(QDate.currentDate())
         self.date_edit.setCalendarPopup(True)
-        # Allow date_edit to resize horizontally
         self.date_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         date_layout.addWidget(self.date_edit)
-        # Store the currently loaded date as ISO string.
         self.current_date_str = self.date_edit.date().toString("yyyy-MM-dd")
         
-        # Counters tab widget
+        # Initialize widget dictionaries for tracking
+        self.current_leads_widgets = {}
+        self.prospects_widgets = {}
+        
+        # Initialize override tracking dictionaries
+        self.current_leads_overrides = {}
+        self.prospects_overrides = {}
+        
+        # Create tabs
         tab_widget = QTabWidget()
-        tab_widget.setMinimumHeight(480)  # Increased from 440 to 480
-        tab_widget.setMaximumHeight(480)
-        tab_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        # --- Helper for section creation ---
-        def add_section(layout, section_label, sources, suffix):
-            layout.addRow(QLabel(f"<b>{section_label}</b>"))
-            counters = {}
-            for idx, source in enumerate(sources):
-                field_name = f"{source.lower()}_{suffix}"
-                # Only show the source name, not the section label, in the spinner label
-                label = source.replace("courses.com.au", "Courses.com.au").replace("c-fox", "C-FOX").capitalize()
-                counter_layout = QHBoxLayout()
-                spin_box = QSpinBox()
-                spin_box.setMinimum(0)
-                spin_box.setMaximum(999)
-                spin_box.setMinimumHeight(31)
-                spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-                spin_box.setFixedWidth(70)
-                spin_box.valueChanged.connect(self.mark_dirty)
-                spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
-                counter_layout.addWidget(spin_box)
-                layout.addRow(label, counter_layout)
-                counters[field_name] = spin_box
-                # Insert bold 'Other' label after 'Agents Non-Connects' in Non-Connects section
-                if section_label == "Non-Connects" and source.lower() == "agents":
-                    layout.addRow(QLabel("<b>Other</b>"), QLabel(""))  # Bold 'Other' label
-            return counters
-        def add_misc_group(layout):
-            misc_counters = {}
-            for misc in ["SMS", "Email"]:
-                field_name = misc.lower()
-                spin_box = QSpinBox()
-                spin_box.setMinimum(0)
-                spin_box.setMaximum(999)
-                spin_box.setMinimumHeight(31)
-                spin_box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-                spin_box.setFixedWidth(70)
-                spin_box.valueChanged.connect(self.mark_dirty)
-                spin_box.valueChanged.connect(lambda val, key=field_name: self.autosave())
-                layout.addRow(misc, spin_box)
-                misc_counters[field_name] = spin_box
-            return misc_counters
-        sources = ["google", "c-fox", "courses.com.au", "organic", "agents"]
-        # --- Current Leads Tab ---
-        current_leads_widget = QWidget()
-        current_leads_layout = QFormLayout(current_leads_widget)
-        current_leads_layout.setSpacing(10)
-        current_leads_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
-        self.counters = {}
-        self.counters.update(add_section(current_leads_layout, "Connects", sources, "connects"))
-        self.counters.update(add_section(current_leads_layout, "Non-Connects", sources, "nonconnects"))
-        self.counters.update(add_misc_group(current_leads_layout))
-        tab_widget.addTab(current_leads_widget, "Current Leads")
-
-        # --- Prospects Tab ---
-        prospects_widget = QWidget()
-        prospects_layout = QFormLayout(prospects_widget)
-        prospects_layout.setSpacing(10)
-        prospects_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
-        self.prospects_counters = {}
-        self.prospects_counters.update(add_section(prospects_layout, "Connects", sources, "connects"))
-        self.prospects_counters.update(add_section(prospects_layout, "Non-Connects", sources, "nonconnects"))
-        self.prospects_counters.update(add_misc_group(prospects_layout))
-        tab_widget.addTab(prospects_widget, "Prospects")
-
+        tab_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        
+        # Create Current Leads tab
+        current_leads_tab = self._create_metrics_tab("current_leads")
+        tab_widget.addTab(current_leads_tab, "Current Leads")
+        
+        # Create Prospects tab  
+        prospects_tab = self._create_metrics_tab("prospects")
+        tab_widget.addTab(prospects_tab, "Prospects")
+        
         self.main_layout.addWidget(tab_widget)
-        # Remove the addStretch() call from here if it exists.
-        # For example, if there was a line like self.main_layout.addStretch() here, it should be removed.
-
-        # Modify existing spacer to be expanding, or ensure it is if previously changed.
-        # The key change is QSizePolicy.Policy.Expanding for the vertical policy.
-        # self.main_layout.addSpacerItem(QSpacerItem(0, 32, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
-
-        # Comments field
-        comments_label = QLabel("Comments:")
-        comments_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        # self.main_layout.addWidget(comments_label) # Commented out to hide the label
+        
+        # Comments/Notes field
         self.comments_edit = QTextEdit()
-        self.comments_edit.setFixedHeight(120)  # Increased from 50 to 120 for better space usage
+        self.comments_edit.setPlaceholderText("Notes...")
+        self.comments_edit.setMaximumHeight(100)
         self.comments_edit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        # Connect mark_dirty before autosave
         self.comments_edit.textChanged.connect(self.mark_dirty)
         self.comments_edit.textChanged.connect(self.autosave)
         self.main_layout.addWidget(self.comments_edit)
-
-        # Ensure no other addStretch() is at the very end of this method if it interferes.
-        # If an addStretch() was at the end of create_form() to push buttons down,
-        # it might need to be re-evaluated or removed if the expanding spacer handles all slack.
-        # Given the buttons are added after create_form in __init__, this might not be an issue here.
+    
+    def _create_metrics_tab(self, tab_name):
+        """Create a metrics tab with the new structure"""
+        # Create scroll area
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        
+        # Create content widget
+        content_widget = QWidget()
+        tab_layout = QVBoxLayout(content_widget)
+        tab_layout.setSpacing(12)
+        tab_layout.setContentsMargins(10, 10, 10, 10)
+        
+        # Determine which widget dictionary to use
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        
+        # CALL - Connects Section
+        connects_group = self._create_call_section("CALL - Connects", "call_connects", tab_name, widgets_dict, overrides_dict)
+        tab_layout.addWidget(connects_group)
+        
+        # CALL - Non-Connects Section
+        nonconnects_group = self._create_call_section("CALL - Non-Connects", "call_nonconnects", tab_name, widgets_dict, overrides_dict)
+        tab_layout.addWidget(nonconnects_group)
+        
+        # CALL - In Betweens Section
+        inbetweens_group = self._create_call_section("CALL - In Betweens", "call_inbetweens", tab_name, widgets_dict, overrides_dict)
+        tab_layout.addWidget(inbetweens_group)
+        
+        # OTHER Section
+        other_group = self._create_other_section(tab_name, widgets_dict, overrides_dict)
+        tab_layout.addWidget(other_group)
+        
+        # GRAND TOTAL - bold and right-aligned, occupying ~25% width
+        grand_total_layout = QHBoxLayout()
+        grand_total_layout.setSpacing(10)
+        grand_total_layout.addStretch(3)  # More stretch to push further right (75% empty space)
+        grand_total_label = QLabel("<b>GRAND TOTAL:</b>")
+        grand_total_label.setMinimumWidth(90)  # Slightly reduced
+        grand_total_layout.addWidget(grand_total_label)
+        
+        grand_total_spinbox = self._configure_spinbox(QSpinBox(), 0, 99999, min_width=60)  # Reduced min width
+        grand_total_spinbox.setObjectName("grand-total")
+        # Make font bold
+        font = grand_total_spinbox.font()
+        font.setBold(True)
+        grand_total_spinbox.setFont(font)
+        grand_total_spinbox.valueChanged.connect(lambda: self._on_total_manually_changed("grand_total", tab_name))
+        widgets_dict["grand_total"] = grand_total_spinbox
+        overrides_dict["grand_total"] = False
+        grand_total_layout.addWidget(grand_total_spinbox)
+        
+        tab_layout.addLayout(grand_total_layout)
+        
+        # Additional Metrics Section
+        additional_group = QGroupBox("Additional Metrics")
+        additional_layout = QFormLayout()
+        additional_layout.setSpacing(10)
+        additional_layout.setContentsMargins(15, 20, 15, 15)
+        additional_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        additional_layout.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
+        
+        for metric_name, display_name in [
+            ("enrolment_packs", "Enrolment Packs"),
+            ("quotes", "Quotes"),
+            ("cpd_booked", "CPD Booked")
+        ]:
+            spinbox = self._configure_spinbox(QSpinBox(), 0, 999)
+            spinbox.valueChanged.connect(lambda val, mn=metric_name, tn=tab_name: self._on_additional_metric_changed(mn, tn))
+            additional_layout.addRow(display_name + ":", spinbox)
+            widgets_dict[metric_name] = spinbox
+        
+        additional_group.setLayout(additional_layout)
+        tab_layout.addWidget(additional_group)
+        
+        # GRAND TOTAL 2 - bold and right-aligned, occupying ~25% width
+        grand_total_2_layout = QHBoxLayout()
+        grand_total_2_layout.setSpacing(10)
+        grand_total_2_layout.addStretch(3)  # More stretch to push further right (75% empty space)
+        grand_total_2_label = QLabel("<b>GRAND TOTAL:</b>")
+        grand_total_2_label.setMinimumWidth(90)  # Slightly reduced
+        grand_total_2_layout.addWidget(grand_total_2_label)
+        
+        grand_total_2_spinbox = self._configure_spinbox(QSpinBox(), 0, 99999, min_width=60)  # Reduced min width
+        grand_total_2_spinbox.setObjectName("grand-total")
+        # Make font bold
+        font = grand_total_2_spinbox.font()
+        font.setBold(True)
+        grand_total_2_spinbox.setFont(font)
+        grand_total_2_spinbox.valueChanged.connect(lambda: self._on_total_manually_changed("grand_total_2", tab_name))
+        widgets_dict["grand_total_2"] = grand_total_2_spinbox
+        overrides_dict["grand_total_2"] = False
+        grand_total_2_layout.addWidget(grand_total_2_spinbox)
+        
+        tab_layout.addLayout(grand_total_2_layout)
+        # Removed addStretch() to eliminate large gap before Notes box
+        
+        # Set content widget and return scroll area
+        scroll.setWidget(content_widget)
+        return scroll
+    
+    def _configure_spinbox(self, spinbox, min_val, max_val, min_width=80):
+        """Helper to configure spinbox with appropriate sizing"""
+        spinbox.setMinimum(min_val)
+        spinbox.setMaximum(max_val)
+        spinbox.setMinimumWidth(min_width)
+        spinbox.setMinimumHeight(32)  # Increased to 32 to prevent bottom cutoff
+        spinbox.setMaximumHeight(32)
+        spinbox.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        # Reduce internal padding and adjust alignment for better number visibility
+        spinbox.setStyleSheet("""
+            QSpinBox { 
+                padding: 4px 4px 4px 4px !important; 
+                padding-left: 6px !important;
+            }
+        """)
+        spinbox.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        return spinbox
+    
+    def _create_call_section(self, title, section_key, tab_name, widgets_dict, overrides_dict):
+        """Create a CALL section (Connects, Non-Connects, or In Betweens)"""
+        group = QGroupBox(title)
+        layout = QFormLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(15, 20, 15, 15)
+        layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        layout.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
+        
+        # Create nested dictionary for this section
+        widgets_dict[section_key] = {}
+        overrides_dict[section_key] = False
+        
+        # Add input fields
+        for field_name, display_name in [
+            ("paid_lead", "Paid Lead"),
+            ("organic_lead", "Organic Lead"),
+            ("agents", "Agents")
+        ]:
+            spinbox = self._configure_spinbox(QSpinBox(), 0, 999)
+            spinbox.valueChanged.connect(lambda val, sk=section_key, tn=tab_name: self._on_section_value_changed(sk, tn))
+            layout.addRow(display_name + ":", spinbox)
+            widgets_dict[section_key][field_name] = spinbox
+        
+        # Add Total field (editable) - bold and right-aligned, occupying ~25% width
+        total_layout = QHBoxLayout()
+        total_layout.addStretch(3)  # More stretch to push further right (75% empty space)
+        total_label = QLabel("<b>Total:</b>")
+        total_label.setMinimumWidth(50)  # Reduced from 80
+        total_layout.addWidget(total_label)
+        
+        total_spinbox = self._configure_spinbox(QSpinBox(), 0, 9999, min_width=60)  # Reduced min width
+        total_spinbox.setObjectName("total-field")
+        # Make font bold
+        font = total_spinbox.font()
+        font.setBold(True)
+        total_spinbox.setFont(font)
+        total_spinbox.valueChanged.connect(lambda: self._on_section_total_manually_changed(section_key, tab_name))
+        total_layout.addWidget(total_spinbox)
+        
+        layout.addRow(total_layout)
+        widgets_dict[section_key]["total"] = total_spinbox
+        
+        group.setLayout(layout)
+        return group
+    
+    def _create_other_section(self, tab_name, widgets_dict, overrides_dict):
+        """Create the OTHER section (SMS, Email)"""
+        group = QGroupBox("OTHER")
+        layout = QFormLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(15, 20, 15, 15)
+        layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        layout.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
+        
+        widgets_dict["other"] = {}
+        overrides_dict["other"] = False
+        
+        for field_name, display_name in [("sms", "SMS"), ("email", "Email")]:
+            spinbox = self._configure_spinbox(QSpinBox(), 0, 999)
+            spinbox.valueChanged.connect(lambda val, tn=tab_name: self._on_other_value_changed(tn))
+            layout.addRow(display_name + ":", spinbox)
+            widgets_dict["other"][field_name] = spinbox
+        
+        # Add Total field - bold and right-aligned, occupying ~25% width
+        total_layout = QHBoxLayout()
+        total_layout.addStretch(3)  # More stretch to push further right (75% empty space)
+        total_label = QLabel("<b>Total:</b>")
+        total_label.setMinimumWidth(50)  # Reduced from 80
+        total_layout.addWidget(total_label)
+        
+        total_spinbox = self._configure_spinbox(QSpinBox(), 0, 9999, min_width=60)  # Reduced min width
+        total_spinbox.setObjectName("total-field")
+        # Make font bold
+        font = total_spinbox.font()
+        font.setBold(True)
+        total_spinbox.setFont(font)
+        total_spinbox.valueChanged.connect(lambda: self._on_other_total_manually_changed(tab_name))
+        total_layout.addWidget(total_spinbox)
+        
+        layout.addRow(total_layout)
+        widgets_dict["other"]["total"] = total_spinbox
+        
+        group.setLayout(layout)
+        return group
+    
+    # ============================================================================
+    # Calculation Methods
+    # ============================================================================
+    
+    def _on_section_value_changed(self, section_key, tab_name):
+        """Called when paid_lead, organic_lead, or agents changes in a CALL section"""
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        
+        # Calculate the new total
+        calculated_total = self._calculate_section_total(widgets_dict[section_key])
+        override_amount = overrides_dict.get(section_key, 0)
+        
+        # Apply override if it exists
+        new_total = calculated_total + override_amount
+        
+        widgets_dict[section_key]["total"].blockSignals(True)
+        widgets_dict[section_key]["total"].setValue(new_total)
+        
+        # Update styling based on override
+        if override_amount != 0:
+            widgets_dict[section_key]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict[section_key]["total"].setToolTip(f"Override: {override_amount:+d} from calculated value")
+        else:
+            widgets_dict[section_key]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict[section_key]["total"].setToolTip("")
+        
+        widgets_dict[section_key]["total"].blockSignals(False)
+        
+        # Recalculate grand total
+        self._recalculate_grand_total(tab_name)
+        self.mark_dirty()
+        self.autosave()
+    
+    def _on_section_total_manually_changed(self, section_key, tab_name):
+        """Called when user manually edits a section total"""
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        
+        # Calculate what it should be automatically
+        auto_total = self._calculate_section_total(widgets_dict[section_key])
+        manual_total = widgets_dict[section_key]["total"].value()
+        
+        # Store the difference as the override amount
+        overrides_dict[section_key] = manual_total - auto_total
+        
+        # Apply visual indicator if there's an override
+        if overrides_dict[section_key] != 0:
+            widgets_dict[section_key]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict[section_key]["total"].setToolTip(f"Override: {overrides_dict[section_key]:+d} from calculated value")
+        else:
+            widgets_dict[section_key]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict[section_key]["total"].setToolTip("")
+        
+        # Recalculate grand total
+        self._recalculate_grand_total(tab_name)
+        self.mark_dirty()
+        self.autosave()
+    
+    def _on_other_value_changed(self, tab_name):
+        """Called when SMS or Email changes in OTHER section"""
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        
+        # Calculate the new total
+        calculated_total = widgets_dict["other"]["sms"].value() + widgets_dict["other"]["email"].value()
+        override_amount = overrides_dict.get("other", 0)
+        
+        # Apply override if it exists
+        new_total = calculated_total + override_amount
+        
+        widgets_dict["other"]["total"].blockSignals(True)
+        widgets_dict["other"]["total"].setValue(new_total)
+        
+        # Update styling based on override
+        if override_amount != 0:
+            widgets_dict["other"]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict["other"]["total"].setToolTip(f"Override: {override_amount:+d} from calculated value")
+        else:
+            widgets_dict["other"]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict["other"]["total"].setToolTip("")
+        
+        widgets_dict["other"]["total"].blockSignals(False)
+        
+        # Recalculate grand total
+        self._recalculate_grand_total(tab_name)
+        self.mark_dirty()
+        self.autosave()
+    
+    def _on_other_total_manually_changed(self, tab_name):
+        """Called when user manually edits OTHER total"""
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        
+        # Calculate what it should be automatically
+        auto_total = widgets_dict["other"]["sms"].value() + widgets_dict["other"]["email"].value()
+        manual_total = widgets_dict["other"]["total"].value()
+        
+        # Store the difference as the override amount
+        overrides_dict["other"] = manual_total - auto_total
+        
+        # Apply visual indicator if there's an override
+        if overrides_dict["other"] != 0:
+            widgets_dict["other"]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict["other"]["total"].setToolTip(f"Override: {overrides_dict['other']:+d} from calculated value")
+        else:
+            widgets_dict["other"]["total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict["other"]["total"].setToolTip("")
+        
+        self._recalculate_grand_total(tab_name)
+        self.mark_dirty()
+        self.autosave()
+    
+    def _on_additional_metric_changed(self, metric_name, tab_name):
+        """Called when enrolment_packs, quotes, or cpd_booked changes"""
+        self._recalculate_grand_total_2(tab_name)
+        self.mark_dirty()
+        self.autosave()
+    
+    def _on_total_manually_changed(self, total_type, tab_name):
+        """Called when user manually edits grand_total or grand_total_2"""
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        
+        # Calculate what it should be automatically
+        if total_type == "grand_total":
+            auto_total = (widgets_dict["call_connects"]["total"].value() +
+                         widgets_dict["call_nonconnects"]["total"].value() +
+                         widgets_dict["call_inbetweens"]["total"].value() +
+                         widgets_dict["other"]["total"].value())
+        else:  # grand_total_2
+            auto_total = (widgets_dict["enrolment_packs"].value() +
+                         widgets_dict["quotes"].value() +
+                         widgets_dict["cpd_booked"].value())
+        
+        manual_total = widgets_dict[total_type].value()
+        
+        # Store the difference as the override amount
+        overrides_dict[total_type] = manual_total - auto_total
+        
+        # Apply visual indicator if there's an override
+        if overrides_dict[total_type] != 0:
+            widgets_dict[total_type].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict[total_type].setToolTip(f"Override: {overrides_dict[total_type]:+d} from calculated value")
+        else:
+            widgets_dict[total_type].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict[total_type].setToolTip("")
+        
+        self.mark_dirty()
+        self.autosave()
+    
+    def _calculate_section_total(self, section_widgets):
+        """Calculate total for a CALL section"""
+        return (section_widgets["paid_lead"].value() + 
+                section_widgets["organic_lead"].value() + 
+                section_widgets["agents"].value())
+    
+    def _recalculate_grand_total(self, tab_name):
+        """Recalculate GRAND TOTAL (sum of all CALL sections + OTHER)"""
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        
+        # Calculate the new total
+        calculated_total = (widgets_dict["call_connects"]["total"].value() +
+                           widgets_dict["call_nonconnects"]["total"].value() +
+                           widgets_dict["call_inbetweens"]["total"].value() +
+                           widgets_dict["other"]["total"].value())
+        override_amount = overrides_dict.get("grand_total", 0)
+        
+        # Apply override if it exists
+        new_total = calculated_total + override_amount
+        
+        widgets_dict["grand_total"].blockSignals(True)
+        widgets_dict["grand_total"].setValue(new_total)
+        
+        # Update styling based on override
+        if override_amount != 0:
+            widgets_dict["grand_total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict["grand_total"].setToolTip(f"Override: {override_amount:+d} from calculated value")
+        else:
+            widgets_dict["grand_total"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict["grand_total"].setToolTip("")
+        
+        widgets_dict["grand_total"].blockSignals(False)
+    
+    def _recalculate_grand_total_2(self, tab_name):
+        """Recalculate GRAND TOTAL 2 (sum of additional metrics)"""
+        widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+        overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+        
+        # Calculate the new total
+        calculated_total = (widgets_dict["enrolment_packs"].value() +
+                           widgets_dict["quotes"].value() +
+                           widgets_dict["cpd_booked"].value())
+        override_amount = overrides_dict.get("grand_total_2", 0)
+        
+        # Apply override if it exists
+        new_total = calculated_total + override_amount
+        
+        widgets_dict["grand_total_2"].blockSignals(True)
+        widgets_dict["grand_total_2"].setValue(new_total)
+        
+        # Update styling based on override
+        if override_amount != 0:
+            widgets_dict["grand_total_2"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; background-color: #FFFACD !important; }")
+            widgets_dict["grand_total_2"].setToolTip(f"Override: {override_amount:+d} from calculated value")
+        else:
+            widgets_dict["grand_total_2"].setStyleSheet("QSpinBox { padding: 4px 4px 4px 4px !important; padding-left: 6px !important; }")
+            widgets_dict["grand_total_2"].setToolTip("")
+        
+        widgets_dict["grand_total_2"].blockSignals(False)
+    
+    def _recalculate_all_totals(self):
+        """Recalculate all totals for both tabs"""
+        for tab_name in ["current_leads", "prospects"]:
+            widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+            overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+            
+            # Recalculate section totals
+            for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+                if not overrides_dict.get(section_key, False):
+                    total = self._calculate_section_total(widgets_dict[section_key])
+                    widgets_dict[section_key]["total"].blockSignals(True)
+                    widgets_dict[section_key]["total"].setValue(total)
+                    widgets_dict[section_key]["total"].blockSignals(False)
+            
+            # Recalculate other total
+            if not overrides_dict.get("other", False):
+                total = widgets_dict["other"]["sms"].value() + widgets_dict["other"]["email"].value()
+                widgets_dict["other"]["total"].blockSignals(True)
+                widgets_dict["other"]["total"].setValue(total)
+                widgets_dict["other"]["total"].blockSignals(False)
+            
+            # Recalculate grand totals
+            self._recalculate_grand_total(tab_name)
+            self._recalculate_grand_total_2(tab_name)
+    
+    # ============================================================================
+    # Existing Methods (to be updated)
+    # ============================================================================
     
     def update_user_dropdown(self):
         # Get users and update combo box
@@ -293,69 +670,186 @@ class MainWindow(QMainWindow):
             self.update_calendar_styles()
     
     def save_data(self, date_str_override=None):
+        """Save entry data with new schema"""
         # Validate form
         if self.user_combo.currentText() == "":
             QMessageBox.warning(self, "Error", "Please select a caller")
             return
+        
         if date_str_override is not None:
             date_str = date_str_override
         else:
             date_str = self.date_edit.date().toString("yyyy-MM-dd")
-        # Separate out misc fields
-        current_leads_data = {k: v.value() for k, v in self.counters.items() if k not in ["sms", "email"]}
-        current_leads_misc = {k: v.value() for k, v in self.counters.items() if k in ["sms", "email"]}
-        prospects_data = {k: v.value() for k, v in self.prospects_counters.items() if k not in ["sms", "email"]}
-        prospects_misc = {k: v.value() for k, v in self.prospects_counters.items() if k in ["sms", "email"]}
+        
+        # Extract data from both tabs
+        current_leads_data = self._extract_tab_data(self.current_leads_widgets)
+        prospects_data = self._extract_tab_data(self.prospects_widgets)
+        
         entry_data = {
             "user": self.user_combo.currentText(),
             "date": date_str,
-            "comments": self.comments_edit.toPlainText(),
-            "current_leads": {**current_leads_data, **current_leads_misc},
-            "prospects": {**prospects_data, **prospects_misc}
+            "current_leads": current_leads_data,
+            "prospects": prospects_data,
+            "comments": self.comments_edit.toPlainText()
         }
+        
         self.data_manager.save_entry(entry_data)
         self.dirty = False
+    
+    def _extract_tab_data(self, widgets_dict):
+        """Extract data from widget dictionary into save format"""
+        data = {}
+        
+        # Extract CALL sections
+        for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+            data[section_key] = {
+                "paid_lead": widgets_dict[section_key]["paid_lead"].value(),
+                "organic_lead": widgets_dict[section_key]["organic_lead"].value(),
+                "agents": widgets_dict[section_key]["agents"].value(),
+                "total": widgets_dict[section_key]["total"].value()
+            }
+        
+        # Extract OTHER section
+        data["other"] = {
+            "sms": widgets_dict["other"]["sms"].value(),
+            "email": widgets_dict["other"]["email"].value(),
+            "total": widgets_dict["other"]["total"].value()
+        }
+        
+        # Extract standalone fields
+        data["grand_total"] = widgets_dict["grand_total"].value()
+        data["enrolment_packs"] = widgets_dict["enrolment_packs"].value()
+        data["quotes"] = widgets_dict["quotes"].value()
+        data["cpd_booked"] = widgets_dict["cpd_booked"].value()
+        data["grand_total_2"] = widgets_dict["grand_total_2"].value()
+        
+        return data
 
     def load_user_entry(self):
-        """Load existing call statistics for the selected user and date into the UI."""
+        """Load existing entry data for the selected user and date into the UI."""
         self.current_date_str = self.date_edit.date().toString("yyyy-MM-dd")
         user = self.user_combo.currentText()
         if not user:
             return
+        
         date_str = self.date_edit.date().toString("yyyy-MM-dd")
         entry = self.data_manager.get_entry_for_user_and_date(user, date_str)
-        self.comments_edit.blockSignals(True)
-        for spin_box in self.counters.values():
-            spin_box.blockSignals(True)
-        for spin_box in self.prospects_counters.values():
-            spin_box.blockSignals(True)
+        
+        # Block all signals during load
+        self._block_all_signals(True)
+        
         if entry:
-            if "current_leads" in entry:
-                for key, spin_box in self.counters.items():
-                    spin_box.setValue(entry["current_leads"].get(key, 0))
-            else:
-                for key, spin_box in self.counters.items():
-                    spin_box.setValue(entry.get(key, 0))
-            if "prospects" in entry:
-                for key, spin_box in self.prospects_counters.items():
-                    spin_box.setValue(entry["prospects"].get(key, 0))
-            else:
-                for spin_box in self.prospects_counters.values():
-                    spin_box.setValue(0)
+            # Load current leads data
+            self._populate_tab_widgets(self.current_leads_widgets, entry.get("current_leads", {}))
+            # Load prospects data
+            self._populate_tab_widgets(self.prospects_widgets, entry.get("prospects", {}))
+            # Load comments
             self.comments_edit.setText(entry.get("comments", ""))
         else:
-            for spin_box in self.counters.values():
-                spin_box.setValue(0)
-            for spin_box in self.prospects_counters.values():
-                spin_box.setValue(0)
-            self.comments_edit.clear()
-        for spin_box in self.counters.values():
-            spin_box.blockSignals(False)
-        for spin_box in self.prospects_counters.values():
-            spin_box.blockSignals(False)
-        self.comments_edit.blockSignals(False)
+            # Clear all to zeros
+            self._clear_all_widgets()
+        
+        # Unblock signals
+        self._block_all_signals(False)
+        
+        # Reset override flags (data loaded from file is not considered overridden)
+        self._reset_all_overrides()
+        
+        # Recalculate all totals to ensure consistency
+        self._recalculate_all_totals()
+        
         self.update_calendar_styles()
         self.dirty = False
+    
+    def _populate_tab_widgets(self, widgets_dict, data):
+        """Populate widgets from loaded data"""
+        # Populate CALL sections
+        for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+            section_data = data.get(section_key, {})
+            for field in ["paid_lead", "organic_lead", "agents", "total"]:
+                value = section_data.get(field, 0)
+                widgets_dict[section_key][field].setValue(value)
+        
+        # Populate OTHER section
+        other_data = data.get("other", {})
+        for field in ["sms", "email", "total"]:
+            value = other_data.get(field, 0)
+            widgets_dict["other"][field].setValue(value)
+        
+        # Populate standalone fields
+        widgets_dict["grand_total"].setValue(data.get("grand_total", 0))
+        widgets_dict["enrolment_packs"].setValue(data.get("enrolment_packs", 0))
+        widgets_dict["quotes"].setValue(data.get("quotes", 0))
+        widgets_dict["cpd_booked"].setValue(data.get("cpd_booked", 0))
+        widgets_dict["grand_total_2"].setValue(data.get("grand_total_2", 0))
+    
+    def _clear_all_widgets(self):
+        """Clear all widgets to zero"""
+        for widgets_dict in [self.current_leads_widgets, self.prospects_widgets]:
+            # Clear CALL sections
+            for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+                for field in ["paid_lead", "organic_lead", "agents", "total"]:
+                    widgets_dict[section_key][field].setValue(0)
+            
+            # Clear OTHER section
+            for field in ["sms", "email", "total"]:
+                widgets_dict["other"][field].setValue(0)
+            
+            # Clear standalone fields
+            widgets_dict["grand_total"].setValue(0)
+            widgets_dict["enrolment_packs"].setValue(0)
+            widgets_dict["quotes"].setValue(0)
+            widgets_dict["cpd_booked"].setValue(0)
+            widgets_dict["grand_total_2"].setValue(0)
+        
+        self.comments_edit.clear()
+    
+    def _block_all_signals(self, block):
+        """Block or unblock signals for all widgets"""
+        for widgets_dict in [self.current_leads_widgets, self.prospects_widgets]:
+            # Block CALL sections
+            for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+                for widget in widgets_dict[section_key].values():
+                    widget.blockSignals(block)
+            
+            # Block OTHER section
+            for widget in widgets_dict["other"].values():
+                widget.blockSignals(block)
+            
+            # Block standalone fields
+            widgets_dict["grand_total"].blockSignals(block)
+            widgets_dict["enrolment_packs"].blockSignals(block)
+            widgets_dict["quotes"].blockSignals(block)
+            widgets_dict["cpd_booked"].blockSignals(block)
+            widgets_dict["grand_total_2"].blockSignals(block)
+        
+        self.comments_edit.blockSignals(block)
+    
+    def _reset_all_overrides(self):
+        """Reset all override flags and styling"""
+        for tab_name in ["current_leads", "prospects"]:
+            widgets_dict = self.current_leads_widgets if tab_name == "current_leads" else self.prospects_widgets
+            overrides_dict = self.current_leads_overrides if tab_name == "current_leads" else self.prospects_overrides
+            
+            # Reset section overrides
+            for section_key in ["call_connects", "call_nonconnects", "call_inbetweens"]:
+                overrides_dict[section_key] = False
+                widgets_dict[section_key]["total"].setStyleSheet("")
+                widgets_dict[section_key]["total"].setToolTip("")
+            
+            # Reset other override
+            overrides_dict["other"] = False
+            widgets_dict["other"]["total"].setStyleSheet("")
+            widgets_dict["other"]["total"].setToolTip("")
+            
+            # Reset grand total overrides
+            overrides_dict["grand_total"] = False
+            widgets_dict["grand_total"].setStyleSheet("")
+            widgets_dict["grand_total"].setToolTip("")
+            
+            overrides_dict["grand_total_2"] = False
+            widgets_dict["grand_total_2"].setStyleSheet("")
+            widgets_dict["grand_total_2"].setToolTip("")
     
     def show_report_dialog(self):
         user = self.user_combo.currentText()
@@ -402,7 +896,7 @@ class MainWindow(QMainWindow):
                     calendar.setDateTextFormat(qdate, boldFormat)
     
     def closeEvent(self, a0):
-        self.save_window_position()
+        self.save_window_geometry()
         if a0 is not None and hasattr(a0, 'accept'):
             a0.accept()
 
@@ -424,48 +918,76 @@ class MainWindow(QMainWindow):
             )
             if reply == QMessageBox.StandardButton.No:
                 return
-        self.save_window_position()
+        self.save_window_geometry()
         QApplication.quit()
 
-    def apply_window_position(self):
+    def apply_window_geometry(self):
+        """Apply saved window position and size, or use defaults"""
         if self.settings_manager.get('remember_window_position', False):
-            position = self.settings_manager.get('window_position', {'x': 100, 'y': 100, 'screen_name': ''})
-            if position:
-                # Try to find the screen by name first
-                screen_name = position.get('screen_name', '')
-                target_screen = None
-                
-                if screen_name:
-                    from PyQt6.QtGui import QGuiApplication
-                    for screen in QGuiApplication.screens():
-                        if screen.name() == screen_name:
-                            target_screen = screen
-                            break
-                
-                # If screen found, move to that screen, otherwise use current screen
-                x = position.get('x', 100)
-                y = position.get('y', 100)
-                
-                # Ensure position is within screen bounds
-                if target_screen:
-                    geometry = target_screen.availableGeometry()
-                    x = max(geometry.x(), min(x, geometry.x() + geometry.width() - self.width()))
-                    y = max(geometry.y(), min(y, geometry.y() + geometry.height() - self.height()))
-                
-                self.move(x, y)
+            geometry = self.settings_manager.get('window_position', {
+                'x': 100, 'y': 100, 'width': 320, 'height': 1024, 'screen_name': ''
+            })
+            
+            # Extract values
+            x = geometry.get('x', 100)
+            y = geometry.get('y', 100)
+            width = geometry.get('width', 320)
+            height = geometry.get('height', 1024)
+            screen_name = geometry.get('screen_name', '')
+            
+            # Find target screen
+            target_screen = None
+            if screen_name:
+                for screen in QGuiApplication.screens():
+                    if screen.name() == screen_name:
+                        target_screen = screen
+                        break
+            
+            # Validate and constrain position/size to screen bounds
+            if target_screen:
+                screen_geometry = target_screen.availableGeometry()
+                x = max(screen_geometry.x(), min(x, screen_geometry.x() + screen_geometry.width() - width))
+                y = max(screen_geometry.y(), min(y, screen_geometry.y() + screen_geometry.height() - height))
+                width = min(width, screen_geometry.width())
+                height = min(height, screen_geometry.height())
+            
+            # Apply geometry
+            self.setGeometry(x, y, width, height)
+        else:
+            # Use default size and center on screen
+            self.resize(320, 1024)
+            screen = QGuiApplication.primaryScreen()
+            if screen:
+                screen_geometry = screen.availableGeometry()
+                center_x = screen_geometry.x() + (screen_geometry.width() - 320) // 2
+                center_y = screen_geometry.y() + (screen_geometry.height() - 1024) // 2
+                self.move(center_x, center_y)
 
-    def save_window_position(self):
+    def save_window_geometry(self):
+        """Save current window position and size"""
         if self.settings_manager.get('remember_window_position', False):
-            from PyQt6.QtGui import QGuiApplication
             pos = self.pos()
+            size = self.size()
             
             # Find which screen the window is currently on
             current_screen = QGuiApplication.screenAt(pos)
             screen_name = current_screen.name() if current_screen else ''
             
-            position_data = {
+            geometry_data = {
                 'x': pos.x(),
                 'y': pos.y(),
+                'width': size.width(),
+                'height': size.height(),
                 'screen_name': screen_name
             }
-            self.settings_manager.set('window_position', position_data)
+            self.settings_manager.set('window_position', geometry_data)
+        else:
+            # Reset to defaults when not remembering position
+            default_geometry = {
+                'x': 100,
+                'y': 100,
+                'width': 320,
+                'height': 1024,
+                'screen_name': ''
+            }
+            self.settings_manager.set('window_position', default_geometry)
